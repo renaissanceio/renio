@@ -9,52 +9,56 @@
 #import "TwitterHistoryViewController.h"
 #import "AttendeeStore.h"
 #import "AttendeeRecord.h"
+#import "RadStyleManager.h"
 
-@implementation TwitterHistoryViewController {
-	NSArray *sortedAttendeeRecords;
-}
+@implementation TwitterHistoryViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-	
-	// Sort the attendee records by score
-	sortedAttendeeRecords = [[AttendeeStore sharedStore].records sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-		
-		AttendeeRecord *firstRecord = obj1;
-		AttendeeRecord *secondRecord = obj2;
-		
-		if (firstRecord.score == secondRecord.score) {
-			return NSOrderedSame;
-		}
-		
-		if (firstRecord.score > secondRecord.score) {
-			return NSOrderedAscending;
-		}
-		else {
-			return NSOrderedDescending;
-		}
-	}];
-}
-
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return sortedAttendeeRecords.count;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *CellIdentifier = @"AttendeeHistoryCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    
-    AttendeeRecord *record		= [sortedAttendeeRecords objectAtIndex:indexPath.row];
-	cell.textLabel.text			= record.twitterID;
-	cell.detailTextLabel.text	= [[NSNumber numberWithInteger:record.score] stringValue];
-    
-    return cell;
+- (instancetype) init
+{
+    if (self = [super init]) {
+        // Sort the attendee records by score
+        NSArray *sortedAttendeeRecords = [[AttendeeStore sharedStore].records sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            
+            AttendeeRecord *firstRecord = obj1;
+            AttendeeRecord *secondRecord = obj2;
+            
+            if (firstRecord.score == secondRecord.score) {
+                return NSOrderedSame;
+            }
+            
+            if (firstRecord.score > secondRecord.score) {
+                return NSOrderedAscending;
+            }
+            else {
+                return NSOrderedDescending;
+            }
+        }];
+        
+        NSMutableArray *rows = [NSMutableArray array];
+        
+        NSDictionary *attributes = [[RadStyleManager sharedInstance] paragraphAttributesWithTabStops];
+        
+        for (int i = 0; i < [sortedAttendeeRecords count]; i++) {
+            AttendeeRecord *record		= [sortedAttendeeRecords objectAtIndex:i];
+            NSString *leftText			= record.twitterID;
+            NSString *rightText         = [[NSNumber numberWithInteger:record.score] stringValue];
+            NSAttributedString *attributedText =
+            [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\t%@",leftText,rightText]
+                                            attributes:attributes];
+            [rows addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                             attributedText, @"attributedText",
+                             nil]];
+        }
+        
+        self.contents = @{@"title":@"History",
+                          @"button_topright":@{@"text":@"Done",
+                                               @"action":
+                                                   ^(){
+                                                       [self dismissViewControllerAnimated:YES completion:NULL];
+                                                   }},
+                          @"sections":@[@{@"rows":rows}]};
+    }
+    return self;
 }
 
 @end

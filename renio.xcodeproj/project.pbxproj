@@ -37,13 +37,10 @@
 		225A62A5187905EE009A7DA4 /* AttendeeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A628D187905EE009A7DA4 /* AttendeeView.m */; };
 		225A62A6187905EE009A7DA4 /* NSString+HashColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A628F187905EE009A7DA4 /* NSString+HashColor.m */; };
 		225A62A7187905EE009A7DA4 /* NSString+MD5.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A6291187905EE009A7DA4 /* NSString+MD5.m */; };
-		225A62A8187905EE009A7DA4 /* TweeStartupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A6293187905EE009A7DA4 /* TweeStartupView.m */; };
-		225A62A9187905EE009A7DA4 /* TweeStartupView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 225A6294187905EE009A7DA4 /* TweeStartupView.xib */; };
 		225A62AA187905EE009A7DA4 /* Twitter.png in Resources */ = {isa = PBXBuildFile; fileRef = 225A6295187905EE009A7DA4 /* Twitter.png */; };
 		225A62AB187905EE009A7DA4 /* Twitter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225A6296187905EE009A7DA4 /* Twitter@2x.png */; };
 		225A62AC187905EE009A7DA4 /* TwitterAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A6298187905EE009A7DA4 /* TwitterAccountViewController.m */; };
 		225A62AD187905EE009A7DA4 /* TwitterHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A629A187905EE009A7DA4 /* TwitterHistoryViewController.m */; };
-		225A62AE187905EE009A7DA4 /* TwitterMob.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 225A629B187905EE009A7DA4 /* TwitterMob.storyboard */; };
 		225A62AF187905EE009A7DA4 /* TwitterMobViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A629D187905EE009A7DA4 /* TwitterMobViewController.m */; };
 		225A62B0187905EE009A7DA4 /* TwitterStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 225A629F187905EE009A7DA4 /* TwitterStore.m */; };
 		225E49BF1878D88400073130 /* 32-circle-south.png in Resources */ = {isa = PBXBuildFile; fileRef = 225E49BD1878D88400073130 /* 32-circle-south.png */; };
@@ -131,16 +128,12 @@
 		225A628F187905EE009A7DA4 /* NSString+HashColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HashColor.m"; sourceTree = "<group>"; };
 		225A6290187905EE009A7DA4 /* NSString+MD5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MD5.h"; sourceTree = "<group>"; };
 		225A6291187905EE009A7DA4 /* NSString+MD5.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MD5.m"; sourceTree = "<group>"; };
-		225A6292187905EE009A7DA4 /* TweeStartupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweeStartupView.h; sourceTree = "<group>"; };
-		225A6293187905EE009A7DA4 /* TweeStartupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweeStartupView.m; sourceTree = "<group>"; };
-		225A6294187905EE009A7DA4 /* TweeStartupView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TweeStartupView.xib; sourceTree = "<group>"; };
 		225A6295187905EE009A7DA4 /* Twitter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Twitter.png; sourceTree = "<group>"; };
 		225A6296187905EE009A7DA4 /* Twitter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Twitter@2x.png"; sourceTree = "<group>"; };
 		225A6297187905EE009A7DA4 /* TwitterAccountViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterAccountViewController.h; sourceTree = "<group>"; };
 		225A6298187905EE009A7DA4 /* TwitterAccountViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterAccountViewController.m; sourceTree = "<group>"; };
 		225A6299187905EE009A7DA4 /* TwitterHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterHistoryViewController.h; sourceTree = "<group>"; };
 		225A629A187905EE009A7DA4 /* TwitterHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterHistoryViewController.m; sourceTree = "<group>"; };
-		225A629B187905EE009A7DA4 /* TwitterMob.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = TwitterMob.storyboard; sourceTree = "<group>"; };
 		225A629C187905EE009A7DA4 /* TwitterMobViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterMobViewController.h; sourceTree = "<group>"; };
 		225A629D187905EE009A7DA4 /* TwitterMobViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterMobViewController.m; sourceTree = "<group>"; };
 		225A629E187905EE009A7DA4 /* TwitterStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterStore.h; sourceTree = "<group>"; };
@@ -295,16 +288,12 @@
 				225A628F187905EE009A7DA4 /* NSString+HashColor.m */,
 				225A6290187905EE009A7DA4 /* NSString+MD5.h */,
 				225A6291187905EE009A7DA4 /* NSString+MD5.m */,
-				225A6292187905EE009A7DA4 /* TweeStartupView.h */,
-				225A6293187905EE009A7DA4 /* TweeStartupView.m */,
-				225A6294187905EE009A7DA4 /* TweeStartupView.xib */,
 				225A6295187905EE009A7DA4 /* Twitter.png */,
 				225A6296187905EE009A7DA4 /* Twitter@2x.png */,
 				225A6297187905EE009A7DA4 /* TwitterAccountViewController.h */,
 				225A6298187905EE009A7DA4 /* TwitterAccountViewController.m */,
 				225A6299187905EE009A7DA4 /* TwitterHistoryViewController.h */,
 				225A629A187905EE009A7DA4 /* TwitterHistoryViewController.m */,
-				225A629B187905EE009A7DA4 /* TwitterMob.storyboard */,
 				225A629C187905EE009A7DA4 /* TwitterMobViewController.h */,
 				225A629D187905EE009A7DA4 /* TwitterMobViewController.m */,
 				225A629E187905EE009A7DA4 /* TwitterStore.h */,
@@ -550,10 +539,8 @@
 				22DE2B061836FBCD0002E9BB /* no.png in Resources */,
 				22AC951F1827727700CF3379 /* InfoPlist.strings in Resources */,
 				222EB5F4183745FF004CDD51 /* rounded-256.png in Resources */,
-				225A62AE187905EE009A7DA4 /* TwitterMob.storyboard in Resources */,
 				225E49C71878E14900073130 /* 01-refresh.png in Resources */,
 				2251D5DF182C8CFF006B6190 /* 166-newspaper.png in Resources */,
-				225A62A9187905EE009A7DA4 /* TweeStartupView.xib in Resources */,
 				2251D5E0182C8CFF006B6190 /* 166-newspaper@2x.png in Resources */,
 				2251D5E8182C90B6006B6190 /* seedling.png in Resources */,
 				2251D5E6182C8F52006B6190 /* icon.png in Resources */,
@@ -582,7 +569,6 @@
 				225A62B0187905EE009A7DA4 /* TwitterStore.m in Sources */,
 				22AC956318289CF700CF3379 /* RadUUID.m in Sources */,
 				22E5168E182B24AE00099B1F /* UIImage+Mask.m in Sources */,
-				225A62A8187905EE009A7DA4 /* TweeStartupView.m in Sources */,
 				225A62AC187905EE009A7DA4 /* TwitterAccountViewController.m in Sources */,
 				22AC953C1827728700CF3379 /* RadHTTPResult.m in Sources */,
 				225A62A7187905EE009A7DA4 /* NSString+MD5.m in Sources */,

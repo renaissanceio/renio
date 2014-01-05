@@ -43,6 +43,17 @@
     return self;
 }
 
+- (NSDictionary *) paragraphAttributesWithTabStops
+{
+    UIFont *paragraphFont = [UIFont fontWithName:@"AvenirNext-Medium" size:14.0*self.fontScale];
+    NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+    CGFloat tabInterval = 270;
+    paragraphStyle.defaultTabInterval = tabInterval;
+    paragraphStyle.tabStops = @[[[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentRight location:tabInterval options:nil]];
+    return @{ NSFontAttributeName: paragraphFont, NSParagraphStyleAttributeName: paragraphStyle};
+}
+
+
 - (NSMutableDictionary *) attributesWithAlignment:(NSTextAlignment) alignment
 {
     NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
@@ -125,6 +136,7 @@
     
     return attributes;
 }
+
 - (void) prepareAttributeDictionaries
 {
     // default markdown attributes

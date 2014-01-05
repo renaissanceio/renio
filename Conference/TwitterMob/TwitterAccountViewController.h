@@ -7,12 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RadTableViewController.h"
 
-@class TwitterAccountViewController;
-
-
-@interface TwitterAccountViewController : UITableViewController
-
-- (IBAction)enableAction:(id)sender;
-
+@interface TwitterAccountViewController : RadTableViewController
 @end

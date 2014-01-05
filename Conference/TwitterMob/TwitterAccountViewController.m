@@ -17,40 +17,47 @@
 	NSIndexPath *selectedIndexPath;
 }
 
+- (instancetype) init
+{
+    if (self = [super init]) {
+        NSMutableArray *rows = [NSMutableArray array];
+        
+        TwitterStore *twitter = [TwitterStore sharedStore];
+        for (int i = 0; i < [twitter.accounts count]; i++) {
+            ACAccount *account = [twitter.accounts objectAtIndex:i];
+            NSString *twitterUsername = [@"@" stringByAppendingString:account.username];
+            BOOL isSelected = [twitterUsername isEqualToString:twitter.username];
+            if (isSelected) {
+                selectedIndexPath = [NSIndexPath indexPathForRow:i inSection:1];
+            }
+            [rows addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                             twitterUsername, @"markdown",
+                             isSelected ? @"checkmark" : @"none", @"accessory",
+                             nil]];
+        }
+        
+        self.contents = @{@"title":@"Accounts",
+                          @"button_topright":@{@"text":@"Done",
+                                               @"action":^(){[self dismissViewControllerAnimated:YES completion:NULL];}},
+                          @"sections":@[
+                                  @{@"rows":@[@{@"markdown":@"The Twitter username you select will be publicly displayed.\n\n\n\nPlease select a username to enable this feature. Deselecting a username disables this feature.",
+                                              @"attributes":@"centered"}]},
+                                  @{@"rows":rows}
+                                  ]};
+    }
+    return self;
+}
+
+
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return ([TwitterStore sharedStore].accounts.count);
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *CellIdentifier = @"TwitterUsernameCell";
-	
-	TwitterStore *twitter = [TwitterStore sharedStore];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-	
-	ACAccount *account = [twitter.accounts objectAtIndex:indexPath.row];
-	NSString *twitterUsername = [@"@" stringByAppendingString:account.username];
-
-	BOOL isSelected = [twitterUsername isEqualToString:twitter.username];
-	
-    cell.textLabel.text = twitterUsername;
-	cell.accessoryType = (isSelected) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-	
-	if (isSelected) {
-		selectedIndexPath = indexPath;
-	}
-	
-	return cell;
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([indexPath section] == 0) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        return;
+    }
 	TwitterStore *twitter = [TwitterStore sharedStore];
-
+    
 	if ([indexPath isEqual:selectedIndexPath]) {
 		selectedIndexPath = nil;
 		
@@ -65,7 +72,7 @@
 		
 		ACAccount *selectedAccount = [twitter.accounts objectAtIndex:indexPath.row];
 		NSString *twitterUsername = [@"@" stringByAppendingString:selectedAccount.username];
-
+        
 		twitter.username = twitterUsername;
 		[tableView cellForRowAtIndexPath:selectedIndexPath].accessoryType = UITableViewCellAccessoryCheckmark;
 	}
