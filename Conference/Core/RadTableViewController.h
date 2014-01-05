@@ -1,5 +1,5 @@
 //
-//  SmartTableViewController.h
+//  RadTableViewController.h
 //  #renio
 //
 //  Created by Tim Burks on 11/8/13.

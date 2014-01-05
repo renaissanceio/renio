@@ -262,8 +262,8 @@
                   (set session nil))
             (else (set surveyname "2014_session")
                   (set session ((Conference sharedInstance) sessionWithName:surveyid))))
-                  (puts surveyname)
-                  (puts (((Conference sharedInstance) surveys) description))
+        (puts surveyname)
+        (puts (((Conference sharedInstance) surveys) description))
         (set survey ((Conference sharedInstance) surveyWithName:surveyname))
         (puts (survey description))
         (set questions (survey surveyquestions:))
@@ -302,3 +302,19 @@
                                    (RadHTTPClient connectWithRequest:saveRequest completionHandler:nil)
                                    (controller dismissViewControllerAnimated:YES completion:nil)))
            sections:sections))
+
+(render "twee"
+        (dict title:"Twee"
+              image:"209-twitter.png"
+          separator:"none"
+         controller:"TwitterMobViewController"
+     button_topleft:(dict image:"209-twitter.png"
+                         action:(do (controller) (controller presentAccountViewController)))
+    button_topright:(dict text:"History"
+                        action:(do (controller) (controller presentHistoryViewController)))
+           sections:(array (dict rows:(array (dict markdown:"Discover the people around you with **Twee**.\n\nTwee uses Bluetooth LE and your Twitter username to announce your presence to other nearby people. It also scans for other Twee users and maintains a history of people it discovers.\n\nEvery time you use the #renio app, Twee automatically records new people it discovers. It keeps a running score based on the number of times a person is nearby and how close they are to you.\n\nTwee also provides a real time display of nearby Twee users, sorted by their proximity to you.\n\nAt the end of the conference you will have a historical record of all of the Renaissance attendees you were near, sorted by how often they were in your vicinity.\n\nNow look up and meet them!"
+                                                 attributes:"spaced")
+                                             (dict markdown:"## Start Now"
+                                                 attributes:"centered"
+                                                     action:(do (controller) (controller loadTwitterAccounts)))
+                                             (dict markdown:"*Your personal history of nearby Twee users is stored locally in this app only. It is never uploaded or shared.*"))))))

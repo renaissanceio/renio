@@ -14,7 +14,10 @@
 #import "AttendeeBrowser.h"
 #import "AttendeeStore.h"
 #import "AttendeeRecord.h"
-#import "TweeStartupView.h"
+
+#import "TwitterAccountViewController.h"
+#import "TwitterHistoryViewController.h"
+#import "RadNavigationController.h"
 
 #define CIRCLE_DIAMETER	200
 #define VERTICAL_BUFFER	0
@@ -24,28 +27,18 @@
 
 static AttendeeAdvertiser *advertiser;
 
+@interface TwitterMobViewController ()
+@property (nonatomic, strong) UITableViewCell *trackingCell;
+@property (strong, nonatomic) UILabel *versionLabel;
+@end
+
 @implementation TwitterMobViewController {
 	UIView			*zoomView;
 	CGFloat			initialVerticalOffset;
 	NSString		*currentUsername;
 	AttendeeBrowser	*browser;
 	NSTimer			*refreshTimer;
-}
-
-+ (UINavigationController *)initialViewController {
-	UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"TwitterMob" bundle:nil];
-	UINavigationController *twitterMob = [storyboard instantiateInitialViewController];
-	
-	return twitterMob;
-}
-
-- (instancetype) initWithCoder:(NSCoder *)aDecoder {
-	if (self = [super initWithCoder:aDecoder]) {
-		self.tabBarItem.image = [UIImage imageNamed:@"Twitter.png"];
-		
-		self.tabBarItem.title = @"Twee";
-	}
-	return self;
+    BOOL            tracking;
 }
 
 - (void)dealloc {
@@ -58,18 +51,15 @@ static AttendeeAdvertiser *advertiser;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
-	CGSize contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height * 3);
-	zoomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, contentSize.width, contentSize.height)];
-	zoomView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight;
-	
-	[self.scrollView addSubview:zoomView];
-		
-	self.scrollView.contentSize				= contentSize;
-	self.scrollView.minimumZoomScale		= 1.0;
-	self.scrollView.maximumZoomScale		= 2.0;
-	self.scrollView.delegate				= self;
-	self.scrollView.directionalLockEnabled	= YES;
-	
+    self.trackingCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Track"];
+    self.trackingCell.selectionStyle = UITableViewCellSelectionStyleNone;
+    //self.trackingCell.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+
+    zoomView = [[UIView alloc] initWithFrame:self.trackingCell.contentView.bounds];
+	zoomView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    //zoomView.backgroundColor = [UIColor darkGrayColor];
+	[self.trackingCell.contentView addSubview:zoomView];
+    
 	self.versionLabel.text = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleShortVersionString"];
 	
 	[self startRefreshTimer];
@@ -81,20 +71,39 @@ static AttendeeAdvertiser *advertiser;
 											   object: nil];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-	[super viewWillAppear:animated];
-	
+- (void) presentAccountViewController
+{
+    [self updateStore:nil];
+
+    [self loadTwitterAccounts];
+}
+
+- (void) presentHistoryViewController
+{
+    [self updateStore:nil];
+
+    TwitterHistoryViewController *controller = [[TwitterHistoryViewController alloc] init];
+    RadNavigationController *navigationController = [[RadNavigationController alloc]
+                                                     initWithRootViewController:controller];
+    [self presentViewController:navigationController animated:YES completion:NULL];
+}
+
+
+- (void) viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
 	TwitterStore *twitter = [TwitterStore sharedStore];
 	
 	// To prevent thrashing, restart only if the username has changed
 	if (![currentUsername isEqualToString:twitter.username]) {
 		currentUsername = twitter.username;
-
+        
 		[self removeAllAttendeeViews];
 		
 		if (twitter.username) {
-			[self unloadTweeStartupView];
 			[self startBrowsing];
+            self->tracking = YES;
+            [self.tableView reloadData];
 		}
 		else {
 			[advertiser stop];
@@ -103,7 +112,8 @@ static AttendeeAdvertiser *advertiser;
 			advertiser = nil;
 			browser = nil;
 			
-			[self loadTweeStartupView];
+            self->tracking = NO;
+            [self.tableView reloadData];
 		}
 	}
 	else {
@@ -168,8 +178,7 @@ static AttendeeAdvertiser *advertiser;
 		if (firstAttendee.range == secondAttendee.range) {
 			return NSOrderedSame;
 		}
-		
-		if (firstAttendee.range > secondAttendee.range) {
+        else if (firstAttendee.range > secondAttendee.range) {
 			return NSOrderedAscending;
 		}
 		else {
@@ -206,13 +215,19 @@ static AttendeeAdvertiser *advertiser;
 		}];
 	}];
 	
-	CGFloat frameHeight =self.self.view.frame.size.height;
+	CGFloat frameHeight = self.view.bounds.size.height - 64 /* top */ - 44 /* bottom */;
 	
 	// Adjust the content size height so that we don't have any extra space
 	if (verticalOffset < frameHeight) {
 		verticalOffset = frameHeight + VERTICAL_BUFFER;
 	}
-	self.scrollView.contentSize = CGSizeMake(self.scrollView.contentSize.width, verticalOffset * self.scrollView.zoomScale);
+    
+    // we have a table containing a single cell with height = verticalOffset
+    CGRect zoomFrame = self->zoomView.frame;
+    zoomFrame.size.height = verticalOffset;
+    self->zoomView.frame = zoomFrame;
+    
+    [self.tableView reloadData];
 }
 
 - (void)removeAllAttendeeViews {
@@ -273,22 +288,40 @@ static AttendeeAdvertiser *advertiser;
 	}
 }
 
-#pragma mark - UIScrollViewDelegate
-
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-    return zoomView;
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if (tracking) {
+        return 1;
+    } else {
+        return [super numberOfSectionsInTableView:tableView];
+    }
 }
 
-- (void)scrollViewDidZoom:(UIScrollView *)scrollView {
-	self.versionLabel.hidden = (scrollView.zoomScale != 1.0);
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (tracking) {
+        return 1;
+    } else {
+        return [super tableView:tableView numberOfRowsInSection:section];
+    }
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-	// Keep zoomView centered horizontally within scrollView
-	CGFloat xOffset = scrollView.bounds.size.width/2 + scrollView.contentOffset.x;
+- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tracking) {
+        return self.trackingCell;
+    } else {
+        return [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    }
+}
 
-	CGPoint newCenter = CGPointMake(xOffset, zoomView.center.y);
-	zoomView.center = newCenter;
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tracking) {
+        return self->zoomView.bounds.size.height;
+    } else {
+        return [super tableView:tableView heightForRowAtIndexPath:indexPath];
+    }
 }
 
 #pragma mark - TwitterStore
@@ -299,7 +332,11 @@ static AttendeeAdvertiser *advertiser;
 		dispatch_async(dispatch_get_main_queue(), ^{
 			
 			if (granted && accounts.count > 0) {
-				[self performSegueWithIdentifier:@"TwitterAccountSegue" sender:nil];
+				// [self performSegueWithIdentifier:@"TwitterAccountSegue" sender:nil];
+                TwitterAccountViewController *controller = [[TwitterAccountViewController alloc] init];
+                RadNavigationController *navigationController = [[RadNavigationController alloc]
+                                                                 initWithRootViewController:controller];
+                [self presentViewController:navigationController animated:YES completion:NULL];
 			}
 			else {
 				[self showTwitterAccountMissing];
@@ -325,7 +362,7 @@ static AttendeeAdvertiser *advertiser;
 	
 	[browser.attendees enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		Attendee *currentAttendee = obj;
-
+        
 		if (currentAttendee.twitterID) {
 			AttendeeRecord *record = [[AttendeeStore sharedStore] attendRecordForTwitterID:currentAttendee.twitterID];
 			
@@ -342,39 +379,6 @@ static AttendeeAdvertiser *advertiser;
 	if (!saved) {
 		DLog(@"AttendeeStore could not be saved!");
 	}
-}
-
-#pragma mark - TweeStartupView
-
-- (IBAction)startNowAction:(id)sender {
-	[self loadTwitterAccounts];
-}
-
-- (void)loadTweeStartupView {
-	if (!self.tweeStartupView) {
-		// Storyboards do not load views from NIB files. So we have to do it manually
-		UINib *nib = [UINib nibWithNibName:@"TweeStartupView" bundle:nil];
-		[nib instantiateWithOwner:self options:nil];
-		
-		// Resize width take take advantage of full screen width
-		CGRect newFrame = self.scrollView.bounds;
-		newFrame.size.height = self.tweeStartupView.bounds.size.height;
-		self.tweeStartupView.frame = newFrame;
-		
-		[self.scrollView addSubview:self.tweeStartupView];
-		
-		// Oversize just in case
-		self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, self.tweeStartupView.bounds.size.height) ;
-		self.scrollView.backgroundColor = [UIColor darkGrayColor];
-	}
-}
-
-- (void)unloadTweeStartupView {
-	[self.tweeStartupView removeFromSuperview];
-	self.tweeStartupView = nil;
-	
-	// The default background color when Twee is up and running
-	self.scrollView.backgroundColor = [UIColor lightGrayColor];
 }
 
 @end

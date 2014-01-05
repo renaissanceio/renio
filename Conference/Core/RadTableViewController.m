@@ -1,5 +1,5 @@
 //
-//  SmartTableViewController.m
+//  RadTableViewController.m
 //  #renio
 //
 //  Created by Tim Burks on 11/8/13.
@@ -32,10 +32,7 @@
 @property (nonatomic, weak) RadTextView *activeTextView;
 @property (nonatomic, weak) RadTextField *activeTextField;
 @property (nonatomic, strong) NSMutableArray *rightBarButtonItemStack;
-
 @property (nonatomic, strong) MPMoviePlayerViewController *player;
-
-@property (nonatomic, strong) NuBlock *refreshBlock;
 @end
 
 @implementation RadTableViewController
@@ -46,7 +43,7 @@
         RadRequest *request = [[RadRequest alloc] initWithPath:parameterString];
         if ([[RadRequestRouter sharedRouter] routeAndHandleRequest:request]) {
             id page = [request result];
-            self.contents = page; // [[Conference sharedInstance].pagesForDisplay objectForKey:parameterString];
+            self.contents = page;
         }
     }
     return self;
@@ -87,7 +84,7 @@
                                              action:NULL];
     
     RadTitleView *container = [[RadTitleView alloc]
-                                 initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,44)];
+                               initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,44)];
     [container setText:self.title];
     
     self.navigationItem.titleView = container;
@@ -161,16 +158,9 @@
         [args setCar:self];
         NuBlock *block = (NuBlock *) action;
         [block evalWithArguments:args context:nil];
-    }
-}
-
-- (void) reload
-{
-    NuBlock *reload = [self.contents objectForKey:@"reload"];
-    if (reload && [reload isKindOfClass:[NuBlock class]]) {
-        NuCell *args = [[NuCell alloc] init];
-        args.car = self;
-        [reload evalWithArguments:args context:[[Nu sharedParser] context]];
+    } else if (action) {
+        void (^actionBlock)() = (id) action;
+        actionBlock();
     }
 }
 
@@ -189,14 +179,23 @@
     id button_topleft = [self.contents objectForKey:@"button_topleft"];
     if (button_topleft) {
         NSString *imageName = [button_topleft objectForKey:@"image"];
-        if (imageName) {
-            UIImage *image = [UIImage imageNamed:imageName];
+        NSString *logoName = [button_topleft objectForKey:@"logo"];
+        if (logoName) {
+            UIImage *image = [UIImage imageNamed:logoName];
             UIImageView *imageView = [[UIImageView alloc]
                                       initWithImage:image];
             CGFloat width = image.size.width/image.size.height*44;
             imageView.frame = CGRectMake(0,0,width,44);
             self.navigationItem.leftBarButtonItem =
             [[UIBarButtonItem alloc] initWithCustomView:imageView];
+        } else if (imageName) {
+            UIImage *image = [UIImage imageNamed:imageName];
+            self.navigationItem.leftBarButtonItem =
+            [[UIBarButtonItem alloc] initWithImage:image
+                               landscapeImagePhone:image
+                                             style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:@selector(topLeftButtonPressed:)];
         } else {
             NSString *title = [button_topleft objectForKey:@"text"];
             self.navigationItem.leftBarButtonItem =
@@ -204,7 +203,6 @@
                                              style:UIBarButtonItemStylePlain
                                             target:self
                                             action:@selector(topLeftButtonPressed:)];
-            
         }
     }
     
@@ -213,11 +211,12 @@
         NSString *imageName = [button_topright objectForKey:@"image"];
         if (imageName) {
             UIImage *image = [UIImage imageNamed:imageName];
-            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:image
-                                                                        landscapeImagePhone:image
-                                                                                      style:UIBarButtonItemStylePlain
-                                                                                     target:self
-                                                                                     action:@selector(topRightButtonPressed:)];
+            self.navigationItem.rightBarButtonItem =
+            [[UIBarButtonItem alloc] initWithImage:image
+                               landscapeImagePhone:image
+                                             style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:@selector(topRightButtonPressed:)];
         } else {
             NSString *title = [button_topright objectForKey:@"text"];
             self.navigationItem.rightBarButtonItem =
@@ -234,8 +233,6 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    [self reload];
     [self refresh];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(fontSizeDidChange:)
@@ -307,6 +304,8 @@
     
     if ([row objectForKey:@"accessory"] && [[row objectForKey:@"accessory"] isEqualToString:@"disclosure"]) {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    } else if ([row objectForKey:@"accessory"] && [[row objectForKey:@"accessory"] isEqualToString:@"checkmark"]) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
     } else {
         cell.accessoryType = UITableViewCellAccessoryNone;
     }
@@ -521,6 +520,12 @@
                 }
             }
         }
+    } else if ([action isKindOfClass:[NuBlock class]]) {
+        NuBlock *actionBlock = (NuBlock *) action;
+        NuCell *args = [[NuCell alloc] init];
+        [args setCar:self];
+        [actionBlock evalWithArguments:args context:[[Nu sharedParser] context]];
+        
     } else if (action) {
         void (^action)() = [row objectForKey:@"action"];
         if (action) {
@@ -553,8 +558,8 @@
     } else {
         // compute the height
         RadTableViewCell *cell = (RadTableViewCell *) [self tableView:tableView
-                                                    cellForRowAtIndexPath:indexPath
-                                                               withImages:NO];
+                                                cellForRowAtIndexPath:indexPath
+                                                           withImages:NO];
         CGRect cellFrame = cell.frame;
         cellFrame.size.width = self.tableView.bounds.size.width;
         cell.frame = cellFrame;
@@ -587,8 +592,8 @@
     NSString *formId = smartView.formId;
     NSString *itemId = smartView.itemId;
     [[RadFormDataManager sharedInstance] setValue:@(slider.value)
-                                     forFormId:formId
-                                        itemId:itemId];
+                                        forFormId:formId
+                                           itemId:itemId];
 }
 
 #pragma mark - text view delegate
@@ -620,8 +625,8 @@
     NSString *formId = smartView.formId;
     NSString *itemId = smartView.itemId;
     [[RadFormDataManager sharedInstance] setValue:smartView.text
-                                     forFormId:formId
-                                        itemId:itemId];
+                                        forFormId:formId
+                                           itemId:itemId];
 }
 
 - (void) doneButtonPressed:(id) sender
@@ -655,8 +660,8 @@
     NSString *formId = smartField.formId;
     NSString *itemId = smartField.itemId;
     [[RadFormDataManager sharedInstance] setValue:smartField.text
-                                     forFormId:formId
-                                        itemId:itemId];
+                                        forFormId:formId
+                                           itemId:itemId];
 }
 
 

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RadTableViewController.h"
 
-@interface TwitterHistoryViewController : UITableViewController
-
+@interface TwitterHistoryViewController : RadTableViewController
 @end
