@@ -11,6 +11,8 @@
 
 #define MISSING_ATTENDEE_AGE	8.0
 
+NSString * const PeripheralConnectionFailedNotification = @"PeripheralConnectionFailedNotification";
+
 @interface AttendeeBrowser ()
 @property (nonatomic, strong) NSMutableArray *attendees;
 @end
@@ -44,6 +46,7 @@
 	}
 	
 	[self.attendees removeAllObjects];
+	self.updated = YES;
 }
 
 - (void)start {
@@ -125,7 +128,7 @@
 		case CBCentralManagerStatePoweredOff:
 			radioPoweredOn = NO;
 			
-			[self.attendees removeAllObjects];
+			[self stop];
 			break;
 			
 		default: {
@@ -164,6 +167,8 @@
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
     DLog(@"Failed to connect to %@. (%@)", peripheral.name, [error localizedDescription]);
 	[self removeAttendeeForPeripheral:peripheral];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:PeripheralConnectionFailedNotification object:peripheral];
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {

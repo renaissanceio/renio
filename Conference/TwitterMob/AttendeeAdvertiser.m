@@ -45,7 +45,7 @@ NSString* const kCharacteristicTwitterIDUUIDString	= @"FD94EED4-769C-4F1A-A3C1-7
 
 #pragma mark - Private methods
 
-- (void)setupService {
+- (void)start {
 	CBUUID *cbuuidService	= [CBUUID UUIDWithString:kAttendeeServiceUUIDString];
 	CBUUID *cbuuidTwitterID	= [CBUUID UUIDWithString:kCharacteristicTwitterIDUUIDString];
 	
@@ -84,7 +84,11 @@ NSString* const kCharacteristicTwitterIDUUIDString	= @"FD94EED4-769C-4F1A-A3C1-7
 - (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral {
 	switch (peripheral.state) {
 		case CBPeripheralManagerStatePoweredOn:
-			[self setupService];
+			[self start];
+			break;
+		
+		case CBPeripheralManagerStatePoweredOff:
+			[self stop];
 			break;
 			
 		default:

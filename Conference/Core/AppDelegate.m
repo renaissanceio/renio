@@ -15,6 +15,9 @@
 #import "RadRequestRouter.h"
 #import "RadHTTP.h"
 #import "Nu.h"
+#import "AttendeeBrowser.h"
+
+#define CONNECTION_FAILED_MAX_COUNT	3
 
 @interface AppDelegate () <RadDownloadViewControllerDelegate, UIAlertViewDelegate>
 @property (nonatomic, strong) UITabBarController *tabBarController;
@@ -22,7 +25,10 @@
 @property (nonatomic, strong) NSNumber *remoteUpdateTime;
 @end
 
-@implementation AppDelegate
+@implementation AppDelegate {
+	BOOL didShowConnectionFailedAlert;
+	NSInteger connectionFailedCount;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -104,6 +110,8 @@
         }
     }];
     
+	didShowConnectionFailedAlert = NO;
+	connectionFailedCount = 0;
 }
 
 - (void) attemptDownload
@@ -172,6 +180,30 @@
         [viewControllers addObject:navigationController];
     }
     [self.tabBarController setViewControllers:viewControllers];
+}
+
+#pragma mark - Twee
+
+- (void)setupConnectionFailedNotification {
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(handleConnectionFailedNotification:)
+												 name: PeripheralConnectionFailedNotification
+											   object: nil];
+}
+
+- (void)handleConnectionFailedNotification:(NSNotification *)note {
+	if (++connectionFailedCount >= CONNECTION_FAILED_MAX_COUNT) {
+		if (!didShowConnectionFailedAlert) {
+			didShowConnectionFailedAlert = YES;
+			
+			UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Bluetooth Error"
+															message: @"Cannot establish a reliable connection to the nearby Twee user. Please try resetting Bluetooth."
+														   delegate: nil
+												  cancelButtonTitle: @"OK"
+												  otherButtonTitles: nil];
+			[alert show];
+		}
+	}
 }
 
 @end

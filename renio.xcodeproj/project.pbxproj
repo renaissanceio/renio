@@ -288,8 +288,6 @@
 				225A628F187905EE009A7DA4 /* NSString+HashColor.m */,
 				225A6290187905EE009A7DA4 /* NSString+MD5.h */,
 				225A6291187905EE009A7DA4 /* NSString+MD5.m */,
-				225A6295187905EE009A7DA4 /* Twitter.png */,
-				225A6296187905EE009A7DA4 /* Twitter@2x.png */,
 				225A6297187905EE009A7DA4 /* TwitterAccountViewController.h */,
 				225A6298187905EE009A7DA4 /* TwitterAccountViewController.m */,
 				225A6299187905EE009A7DA4 /* TwitterHistoryViewController.h */,
@@ -298,6 +296,8 @@
 				225A629D187905EE009A7DA4 /* TwitterMobViewController.m */,
 				225A629E187905EE009A7DA4 /* TwitterStore.h */,
 				225A629F187905EE009A7DA4 /* TwitterStore.m */,
+				225A6295187905EE009A7DA4 /* Twitter.png */,
+				225A6296187905EE009A7DA4 /* Twitter@2x.png */,
 			);
 			path = TwitterMob;
 			sourceTree = "<group>";

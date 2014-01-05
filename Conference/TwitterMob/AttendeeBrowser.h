@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import "Attendee.h"
 
+NSString * const PeripheralConnectionFailedNotification;
 
 @interface AttendeeBrowser : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate, AttendeeDelegate>
 
