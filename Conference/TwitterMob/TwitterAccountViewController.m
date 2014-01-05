@@ -40,8 +40,8 @@
                           @"button_topright":@{@"text":@"Done",
                                                @"action":^(){[self dismissViewControllerAnimated:YES completion:NULL];}},
                           @"sections":@[
-                                  @{@"rows":@[@{@"markdown":@"The Twitter username you select will be publicly displayed.\n\n\n\nPlease select a username to enable this feature. Deselecting a username disables this feature.",
-                                              @"attributes":@"centered"}]},
+                                  @{@"rows":@[@{@"markdown":@"The Twitter username you select will be publicly shared over Bluetooth.\n\n\n\nPlease select a username to enable sharing. Deselecting a username disables sharing.",
+                                              @"attributes":@"spaced"}]},
                                   @{@"rows":rows}
                                   ]};
     }

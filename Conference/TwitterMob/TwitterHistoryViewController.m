@@ -52,10 +52,7 @@
         
         self.contents = @{@"title":@"History",
                           @"button_topright":@{@"text":@"Done",
-                                               @"action":
-                                                   ^(){
-                                                       [self dismissViewControllerAnimated:YES completion:NULL];
-                                                   }},
+                                               @"action":^(){[self dismissViewControllerAnimated:YES completion:NULL];}},
                           @"sections":@[@{@"rows":rows}]};
     }
     return self;
