@@ -38,7 +38,6 @@ static AttendeeAdvertiser *advertiser;
 	NSString		*currentUsername;
 	AttendeeBrowser	*browser;
 	NSTimer			*refreshTimer;
-    CGFloat         viewHeight;
     BOOL            tracking;
 }
 
@@ -56,11 +55,9 @@ static AttendeeAdvertiser *advertiser;
     self.trackingCell.selectionStyle = UITableViewCellSelectionStyleNone;
     //self.trackingCell.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
 
-	CGSize contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
-	zoomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, contentSize.width, 3*contentSize.height)];
+    zoomView = [[UIView alloc] initWithFrame:self.trackingCell.contentView.bounds];
 	zoomView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     //zoomView.backgroundColor = [UIColor darkGrayColor];
-	self->viewHeight = zoomView.bounds.size.height;
 	[self.trackingCell.contentView addSubview:zoomView];
     
 	self.versionLabel.text = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleShortVersionString"];
@@ -76,11 +73,15 @@ static AttendeeAdvertiser *advertiser;
 
 - (void) presentAccountViewController
 {
+    [self updateStore:nil];
+
     [self loadTwitterAccounts];
 }
 
 - (void) presentHistoryViewController
 {
+    [self updateStore:nil];
+
     TwitterHistoryViewController *controller = [[TwitterHistoryViewController alloc] init];
     RadNavigationController *navigationController = [[RadNavigationController alloc]
                                                      initWithRootViewController:controller];
@@ -214,20 +215,19 @@ static AttendeeAdvertiser *advertiser;
 		}];
 	}];
 	
-	CGFloat frameHeight = self.view.frame.size.height;
+	CGFloat frameHeight = self.view.bounds.size.height - 64 /* top */ - 44 /* bottom */;
 	
 	// Adjust the content size height so that we don't have any extra space
 	if (verticalOffset < frameHeight) {
 		verticalOffset = frameHeight + VERTICAL_BUFFER;
 	}
     
-    // we have a table containing a single cell with height = self->viewHeight
-    //self->viewHeight = verticalOffset;
-    //[self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]]
-    //                      withRowAnimation:UITableViewRowAnimationNone];
+    // we have a table containing a single cell with height = verticalOffset
+    CGRect zoomFrame = self->zoomView.frame;
+    zoomFrame.size.height = verticalOffset;
+    self->zoomView.frame = zoomFrame;
     
-    //UIScrollView *scrollView = (UIScrollView *) self.view;
-	//scrollView.contentSize = CGSizeMake(scrollView.contentSize.width, verticalOffset * scrollView.zoomScale);
+    [self.tableView reloadData];
 }
 
 - (void)removeAllAttendeeViews {
@@ -318,9 +318,7 @@ static AttendeeAdvertiser *advertiser;
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tracking) {
-        NSLog(@"returning row height %f", self->viewHeight);
-        return self->viewHeight;
-        // return self->zoomView.bounds.size.height;
+        return self->zoomView.bounds.size.height;
     } else {
         return [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
