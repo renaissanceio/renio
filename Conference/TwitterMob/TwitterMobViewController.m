@@ -18,6 +18,7 @@
 #import "TwitterAccountViewController.h"
 #import "TwitterHistoryViewController.h"
 #import "RadNavigationController.h"
+#import "RadStyleManager.h"
 
 #define CIRCLE_DIAMETER	200
 #define VERTICAL_BUFFER	0
@@ -30,10 +31,11 @@ static AttendeeAdvertiser *advertiser;
 @interface TwitterMobViewController ()
 @property (nonatomic, strong) UITableViewCell *trackingCell;
 @property (strong, nonatomic) UILabel *versionLabel;
+@property (strong, nonatomic) UILabel *noDevicesLabel;
 @end
 
 @implementation TwitterMobViewController {
-	UIView			*zoomView;
+	UIView			*activityView;
 	CGFloat			initialVerticalOffset;
 	NSString		*currentUsername;
 	AttendeeBrowser	*browser;
@@ -50,15 +52,23 @@ static AttendeeAdvertiser *advertiser;
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	
+    
     self.trackingCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Track"];
     self.trackingCell.selectionStyle = UITableViewCellSelectionStyleNone;
-    //self.trackingCell.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
-
-    zoomView = [[UIView alloc] initWithFrame:self.trackingCell.contentView.bounds];
-	zoomView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    //zoomView.backgroundColor = [UIColor darkGrayColor];
-	[self.trackingCell.contentView addSubview:zoomView];
+    
+    activityView = [[UIView alloc] initWithFrame:self.trackingCell.contentView.bounds];
+	activityView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	[self.trackingCell.contentView addSubview:activityView];
+    
+    CGRect noDevicesLabelFrame = activityView.bounds;
+    noDevicesLabelFrame.size.height = 40 * [[RadStyleManager sharedInstance] deviceTextScale];
+    self.noDevicesLabel = [[UILabel alloc] initWithFrame:noDevicesLabelFrame];
+    self.noDevicesLabel.backgroundColor = [UIColor whiteColor];
+    self.noDevicesLabel.text = @"Scanning for devices...";
+    self.noDevicesLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.noDevicesLabel.textAlignment = NSTextAlignmentCenter;
+    self.noDevicesLabel.font = [UIFont fontWithName:@"AvenirNext-Medium" size:16*[[RadStyleManager sharedInstance] deviceTextScale]];
+    [activityView addSubview:self.noDevicesLabel];
     
 	self.versionLabel.text = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleShortVersionString"];
 	
@@ -74,17 +84,14 @@ static AttendeeAdvertiser *advertiser;
 - (void) presentAccountViewController
 {
     [self updateStore:nil];
-
     [self loadTwitterAccounts];
 }
 
 - (void) presentHistoryViewController
 {
     [self updateStore:nil];
-
     TwitterHistoryViewController *controller = [[TwitterHistoryViewController alloc] init];
-    RadNavigationController *navigationController = [[RadNavigationController alloc]
-                                                     initWithRootViewController:controller];
+    RadNavigationController *navigationController = [[RadNavigationController alloc] initWithRootViewController:controller];
     [self presentViewController:navigationController animated:YES completion:NULL];
 }
 
@@ -122,38 +129,20 @@ static AttendeeAdvertiser *advertiser;
 	}
 }
 
-#pragma mark - Segues
-
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
-	BOOL shouldPerform = YES;
-	
-	if ([identifier isEqualToString:@"TwitterAccountSegue"]) {
-		shouldPerform = [TwitterStore sharedStore].hasAccounts;
-		
-		if (!shouldPerform) {
-			[self loadTwitterAccounts];
-		}
-	}
-	return shouldPerform;
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-	// For any segue, update the AttendStore
-	[self updateStore:nil];
-}
-
 #pragma mark - AttendeeViews
 
 - (AttendeeView *)attendeeViewForAttendee:(Attendee *)attendee {
 	__block AttendeeView *attendeeViewForAttendee;
 	
-	[zoomView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-		AttendeeView *attendeeView = obj;
-		
-		if ([attendeeView.attendee matchesAttendee:attendee]) {
-			attendeeViewForAttendee = attendeeView;
-			*stop = YES;
-		}
+	[activityView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AttendeeView class]]) {
+            AttendeeView *attendeeView = obj;
+            
+            if ([attendeeView.attendee matchesAttendee:attendee]) {
+                attendeeViewForAttendee = attendeeView;
+                *stop = YES;
+            }
+        }
 	}];
 	
 	return attendeeViewForAttendee;
@@ -161,7 +150,7 @@ static AttendeeAdvertiser *advertiser;
 
 - (AttendeeView *)freshAttendeeView {
 	AttendeeView *attendeeView	= [[AttendeeView alloc] initWithFrame:CGRectMake(0, 0, CIRCLE_DIAMETER, CIRCLE_DIAMETER)];
-	attendeeView.center			= CGPointMake(zoomView.bounds.size.width/2, self.view.bounds.size.height);
+	attendeeView.center			= CGPointMake(activityView.bounds.size.width/2, self.view.bounds.size.height);
 	attendeeView.pulseEnabled	= YES;
 	
 	return attendeeView;
@@ -187,7 +176,9 @@ static AttendeeAdvertiser *advertiser;
 	}];
 	
 	[self removeOldAttendeeViews];
-	
+    
+    self.noDevicesLabel.hidden = ([sortedAttendees count] > 0);
+    
 	// Update the associated AttendeeViews for each Attendee
 	[sortedAttendees enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		Attendee *attendee = obj;
@@ -202,13 +193,13 @@ static AttendeeAdvertiser *advertiser;
 			attendeeView = [self freshAttendeeView];
 			attendeeView.attendee = attendee;
 			
-			[zoomView addSubview:attendeeView];
+			[activityView addSubview:attendeeView];
 		}
 		
 		// Set position of the AttendeeView
 		[UIView animateWithDuration:0.5 animations:^{
 			verticalOffset += attendeeView.frame.size.height/2;
-			attendeeView.center = CGPointMake(zoomView.bounds.size.width/2, verticalOffset);
+			attendeeView.center = CGPointMake(activityView.bounds.size.width/2, verticalOffset);
 			
 			// Setup vertical offset for next AttendeeView
 			verticalOffset += attendeeView.frame.size.height/2 + VERTICAL_BUFFER;
@@ -223,28 +214,32 @@ static AttendeeAdvertiser *advertiser;
 	}
     
     // we have a table containing a single cell with height = verticalOffset
-    CGRect zoomFrame = self->zoomView.frame;
+    CGRect zoomFrame = self->activityView.frame;
     zoomFrame.size.height = verticalOffset;
-    self->zoomView.frame = zoomFrame;
+    self->activityView.frame = zoomFrame;
     
     [self.tableView reloadData];
 }
 
 - (void)removeAllAttendeeViews {
-	[zoomView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-		[obj removeFromSuperview];
+	[activityView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AttendeeView class]]) {
+            [obj removeFromSuperview];
+        }
 	}];
 }
 
 - (void)removeOldAttendeeViews {
-	[zoomView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-		AttendeeView *attendeeView = obj;
-		
-		BOOL attendeeExists = [browser.attendees containsObject:attendeeView.attendee];
-		
-		if (!attendeeExists) {
-			[attendeeView removeFromSuperview];
-		}
+	[activityView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AttendeeView class]]) {
+            AttendeeView *attendeeView = obj;
+            
+            BOOL attendeeExists = [browser.attendees containsObject:attendeeView.attendee];
+            
+            if (!attendeeExists) {
+                [attendeeView removeFromSuperview];
+            }
+        }
 	}];
 }
 
@@ -318,7 +313,7 @@ static AttendeeAdvertiser *advertiser;
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tracking) {
-        return self->zoomView.bounds.size.height;
+        return self->activityView.bounds.size.height;
     } else {
         return [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
@@ -328,11 +323,8 @@ static AttendeeAdvertiser *advertiser;
 
 - (void)loadTwitterAccounts {
 	[[TwitterStore sharedStore] fetchTwitterAccountsWithBlock:^(BOOL granted, NSArray *accounts) {
-		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			
 			if (granted && accounts.count > 0) {
-				// [self performSegueWithIdentifier:@"TwitterAccountSegue" sender:nil];
                 TwitterAccountViewController *controller = [[TwitterAccountViewController alloc] init];
                 RadNavigationController *navigationController = [[RadNavigationController alloc]
                                                                  initWithRootViewController:controller];
@@ -346,9 +338,8 @@ static AttendeeAdvertiser *advertiser;
 }
 
 - (void)showTwitterAccountMissing {
-	NSString *instructions = @"Please go to Settings, select Twitter, and login to your Twitter account.";
-	
-	UIAlertView *alertView = [[UIAlertView alloc] initWithTitle: @"Twitter Account Missing"
+	NSString *instructions = @"Please go to Settings, select Twitter, and login to your Twitter account. You may also need to change a switch to allow this app to access your Twitter account information.";
+	UIAlertView *alertView = [[UIAlertView alloc] initWithTitle: @"No Twitter Accounts"
 														message: instructions
 													   delegate: nil
 											  cancelButtonTitle: @"Continue"
