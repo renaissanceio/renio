@@ -315,6 +315,7 @@
         cell.textLabel.attributedText = attributedText;
     } else {
         NSString *markdown = [row objectForKey:@"markdown"];
+        CGFloat width = self.tableView.bounds.size.width;
         if (markdown) {
             NSString *attributes = [row objectForKey:@"attributes"];
             cell.textLabel.attributedText = [[RadStyleManager sharedInstance]

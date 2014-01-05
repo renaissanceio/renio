@@ -31,7 +31,7 @@
                 selectedIndexPath = [NSIndexPath indexPathForRow:i inSection:1];
             }
             [rows addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                             twitterUsername, @"markdown",
+                             [NSString stringWithFormat:@"### %@",twitterUsername], @"markdown",
                              isSelected ? @"checkmark" : @"none", @"accessory",
                              nil]];
         }
@@ -41,7 +41,7 @@
                                                @"action":^(){[self dismissViewControllerAnimated:YES completion:NULL];}},
                           @"sections":@[
                                   @{@"rows":@[@{@"markdown":@"The Twitter username you select will be publicly shared over Bluetooth.\n\n\n\nPlease select a username to enable sharing. Deselecting a username disables sharing.",
-                                              @"attributes":@"spaced"}]},
+                                                @"attributes":@"spaced"}]},
                                   @{@"rows":rows}
                                   ]};
     }

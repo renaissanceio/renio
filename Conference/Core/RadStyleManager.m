@@ -43,26 +43,17 @@
     return self;
 }
 
-- (NSDictionary *) paragraphAttributesWithTabStops
-{
-    UIFont *paragraphFont = [UIFont fontWithName:@"AvenirNext-Medium" size:14.0*self.fontScale];
-    NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-    CGFloat tabInterval = 270;
-    paragraphStyle.defaultTabInterval = tabInterval;
-    paragraphStyle.tabStops = @[[[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentRight location:tabInterval options:nil]];
-    return @{ NSFontAttributeName: paragraphFont, NSParagraphStyleAttributeName: paragraphStyle};
-}
-
-
 - (NSMutableDictionary *) attributesWithAlignment:(NSTextAlignment) alignment
+                                        textScale:(CGFloat) textScale
+                                 paragraphSpacing:(CGFloat) paragraphSpacing
 {
     NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
     // p
-    UIFont *paragraphFont = [UIFont fontWithName:@"AvenirNext-Medium" size:14.0*self.fontScale];
+    UIFont *paragraphFont = [UIFont fontWithName:@"AvenirNext-Medium" size:14.0*self.fontScale*textScale];
     NSMutableParagraphStyle* pParagraphStyle = [[NSMutableParagraphStyle alloc] init];
     pParagraphStyle.alignment = alignment;
-    //    pParagraphStyle.paragraphSpacing = 0;
-    //    pParagraphStyle.paragraphSpacingBefore = 0;
+    pParagraphStyle.paragraphSpacing = paragraphSpacing;
+    pParagraphStyle.paragraphSpacingBefore = paragraphSpacing;
     //    pParagraphStyle.lineSpacing = 0;
     //    pParagraphStyle.lineHeightMultiple = 0;
     pParagraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
@@ -73,42 +64,42 @@
     [attributes setObject:pAttributes forKey:@(PARA)];
     
     // h1
-    UIFont *h1Font = [UIFont fontWithName:@"AvenirNext-Bold" size:24.0*self.fontScale];
+    UIFont *h1Font = [UIFont fontWithName:@"AvenirNext-Bold" size:24.0*self.fontScale*textScale];
     [attributes setObject:@{NSFontAttributeName : h1Font,
                             NSParagraphStyleAttributeName: pParagraphStyle}
                    forKey:@(H1)];
     
     // h2
-    UIFont *h2Font = [UIFont fontWithName:@"AvenirNext-Bold" size:18.0*self.fontScale];
+    UIFont *h2Font = [UIFont fontWithName:@"AvenirNext-Bold" size:18.0*self.fontScale*textScale];
     [attributes setObject:@{NSFontAttributeName : h2Font,
                             NSParagraphStyleAttributeName: pParagraphStyle}
                    forKey:@(H2)];
     
     // h3
-    UIFont *h3Font = [UIFont fontWithName:@"AvenirNext-DemiBold" size:17.0*self.fontScale];
+    UIFont *h3Font = [UIFont fontWithName:@"AvenirNext-DemiBold" size:17.0*self.fontScale*textScale];
     [attributes setObject:@{NSFontAttributeName : h3Font}
                    forKey:@(H3)];
     
     // em
-    UIFont *emFont = [UIFont fontWithName:@"AvenirNext-MediumItalic" size:15.0*self.fontScale];
+    UIFont *emFont = [UIFont fontWithName:@"AvenirNext-MediumItalic" size:15.0*self.fontScale*textScale];
     [attributes setObject:@{NSFontAttributeName : emFont}
                    forKey:@(EMPH)];
     
     // strong
-    UIFont *strongFont = [UIFont fontWithName:@"AvenirNext-Bold" size:15.0*self.fontScale];
+    UIFont *strongFont = [UIFont fontWithName:@"AvenirNext-Bold" size:15.0*self.fontScale*textScale];
     [attributes setObject:@{NSFontAttributeName : strongFont}
                    forKey:@(STRONG)];
     
     // ul
     NSMutableParagraphStyle* listParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    listParagraphStyle.headIndent = 16.0*self.fontScale;
+    listParagraphStyle.headIndent = 16.0*self.fontScale*textScale;
     [attributes setObject:@{NSFontAttributeName : paragraphFont,
                             NSParagraphStyleAttributeName : listParagraphStyle}
                    forKey:@(BULLETLIST)];
     
     // li
     NSMutableParagraphStyle* listItemParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    listItemParagraphStyle.headIndent = 16.0*self.fontScale;
+    listItemParagraphStyle.headIndent = 16.0*self.fontScale*textScale;
     [attributes setObject:@{NSFontAttributeName : paragraphFont,
                             NSParagraphStyleAttributeName : listItemParagraphStyle}
                    forKey:@(LISTITEM)];
@@ -120,17 +111,17 @@
     
     // blockquote
     NSMutableParagraphStyle* blockquoteParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    blockquoteParagraphStyle.headIndent = 16.0;
-    blockquoteParagraphStyle.tailIndent = 16.0;
-    blockquoteParagraphStyle.firstLineHeadIndent = 16.0;
-    [attributes setObject:@{NSFontAttributeName : [emFont fontWithSize:18.0*self.fontScale], NSParagraphStyleAttributeName : pParagraphStyle}
+    blockquoteParagraphStyle.headIndent = 16.0*textScale;
+    blockquoteParagraphStyle.tailIndent = 16.0*textScale;
+    blockquoteParagraphStyle.firstLineHeadIndent = 16.0*textScale;
+    [attributes setObject:@{NSFontAttributeName : [emFont fontWithSize:18.0*self.fontScale*textScale], NSParagraphStyleAttributeName : pParagraphStyle}
                    forKey:@(BLOCKQUOTE)];
     
     // verbatim (code)
     NSMutableParagraphStyle* verbatimParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    verbatimParagraphStyle.headIndent = 12.0;
-    verbatimParagraphStyle.firstLineHeadIndent = 12.0;
-    UIFont *verbatimFont = [UIFont fontWithName:@"CourierNewPSMT" size:14.0*self.fontScale];
+    verbatimParagraphStyle.headIndent = 12.0*textScale;
+    verbatimParagraphStyle.firstLineHeadIndent = 12.0*textScale;
+    UIFont *verbatimFont = [UIFont fontWithName:@"CourierNewPSMT" size:14.0*self.fontScale*textScale];
     [attributes setObject:@{NSFontAttributeName : verbatimFont, NSParagraphStyleAttributeName : verbatimParagraphStyle}
                    forKey:@(VERBATIM)];
     
@@ -140,173 +131,34 @@
 - (void) prepareAttributeDictionaries
 {
     // default markdown attributes
-    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentLeft]
+    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentLeft
+                                                              textScale:1.0
+                                                       paragraphSpacing:0]
                                    forKey:@"default"];
     
     // right-justified attributes
-    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentRight]
+    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentRight
+                                                              textScale:1.0
+                                                       paragraphSpacing:0]
                                    forKey:@"right"];
     
     // centered-text attributes
-    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentCenter]
+    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentCenter
+                                                              textScale:1.0
+                                                       paragraphSpacing:0]
                                    forKey:@"centered"];
     
-    // smaller markdown attributes
-    {
-        NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
-        // p
-        UIFont *paragraphFont = [UIFont fontWithName:@"AvenirNext-Medium" size:10.0*self.fontScale];
-        NSMutableParagraphStyle* pParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        //    pParagraphStyle.paragraphSpacing = 0;
-        //    pParagraphStyle.paragraphSpacingBefore = 0;
-        //    pParagraphStyle.lineSpacing = 0;
-        //    pParagraphStyle.lineHeightMultiple = 0;
-        pParagraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-        
-        NSDictionary *pAttributes = @{NSFontAttributeName : paragraphFont,
-                                      NSParagraphStyleAttributeName : pParagraphStyle};
-        
-        [attributes setObject:pAttributes forKey:@(PARA)];
-        
-        // h1
-        UIFont *h1Font = [UIFont fontWithName:@"AvenirNext-Bold" size:20.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : h1Font,
-                                NSParagraphStyleAttributeName: pParagraphStyle}
-                       forKey:@(H1)];
-        
-        // h2
-        UIFont *h2Font = [UIFont fontWithName:@"AvenirNext-Bold" size:14.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : h2Font,
-                                NSParagraphStyleAttributeName: pParagraphStyle}
-                       forKey:@(H2)];
-        
-        // h3
-        UIFont *h3Font = [UIFont fontWithName:@"AvenirNext-DemiBold" size:13.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : h3Font}
-                       forKey:@(H3)];
-        
-        // em
-        UIFont *emFont = [UIFont fontWithName:@"AvenirNext-MediumItalic" size:11.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : emFont} forKey:@(EMPH)];
-        
-        // strong
-        UIFont *strongFont = [UIFont fontWithName:@"AvenirNext-Bold" size:11.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : strongFont} forKey:@(STRONG)];
-        
-        // ul
-        NSMutableParagraphStyle* listParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        listParagraphStyle.headIndent = 16.0*self.fontScale;
-        [attributes setObject:@{NSFontAttributeName : paragraphFont,
-                                NSParagraphStyleAttributeName : listParagraphStyle}
-                       forKey:@(BULLETLIST)];
-        
-        // li
-        NSMutableParagraphStyle* listItemParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        listItemParagraphStyle.headIndent = 12.0*self.fontScale;
-        [attributes setObject:@{NSFontAttributeName : paragraphFont,
-                                NSParagraphStyleAttributeName : listItemParagraphStyle}
-                       forKey:@(LISTITEM)];
-        
-        // a
-        UIColor *linkColor = [UIColor blueColor];
-        [attributes setObject:@{NSForegroundColorAttributeName : linkColor}
-                       forKey:@(LINK)];
-        
-        // blockquote
-        NSMutableParagraphStyle* blockquoteParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        blockquoteParagraphStyle.headIndent = 12.0;
-        blockquoteParagraphStyle.tailIndent = 12.0;
-        blockquoteParagraphStyle.firstLineHeadIndent = 12.0;
-        [attributes setObject:@{NSFontAttributeName : [emFont fontWithSize:14.0*self.fontScale], NSParagraphStyleAttributeName : pParagraphStyle} forKey:@(BLOCKQUOTE)];
-        
-        // verbatim (code)
-        NSMutableParagraphStyle* verbatimParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        verbatimParagraphStyle.headIndent = 8.0;
-        verbatimParagraphStyle.firstLineHeadIndent = 8.0;
-        UIFont *verbatimFont = [UIFont fontWithName:@"CourierNewPSMT" size:10.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : verbatimFont, NSParagraphStyleAttributeName : verbatimParagraphStyle} forKey:@(VERBATIM)];
-        
-        [self.attributeDictionaries setObject:attributes forKey:@"small"];
-    }
+    // small text attributes
+    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentLeft
+                                                              textScale:0.7
+                                                       paragraphSpacing:0]
+                                   forKey:@"small"];
     
-    // default markdown attributes
-    {
-        NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
-        // p
-        UIFont *paragraphFont = [UIFont fontWithName:@"AvenirNext-Medium" size:14.0*self.fontScale];
-        NSMutableParagraphStyle* pParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        pParagraphStyle.paragraphSpacing = 10;
-        pParagraphStyle.paragraphSpacingBefore = 10;
-        //    pParagraphStyle.lineSpacing = 0;
-        //    pParagraphStyle.lineHeightMultiple = 0;
-        pParagraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-        
-        NSDictionary *pAttributes = @{NSFontAttributeName : paragraphFont,
-                                      NSParagraphStyleAttributeName : pParagraphStyle};
-        
-        [attributes setObject:pAttributes forKey:@(PARA)];
-        
-        // h1
-        UIFont *h1Font = [UIFont fontWithName:@"AvenirNext-Bold" size:24.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : h1Font,
-                                NSParagraphStyleAttributeName: pParagraphStyle}
-                       forKey:@(H1)];
-        
-        // h2
-        UIFont *h2Font = [UIFont fontWithName:@"AvenirNext-Bold" size:18.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : h2Font,
-                                NSParagraphStyleAttributeName: pParagraphStyle}
-                       forKey:@(H2)];
-        
-        // h3
-        UIFont *h3Font = [UIFont fontWithName:@"AvenirNext-DemiBold" size:17.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : h3Font}
-                       forKey:@(H3)];
-        
-        // em
-        UIFont *emFont = [UIFont fontWithName:@"AvenirNext-MediumItalic" size:15.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : emFont} forKey:@(EMPH)];
-        
-        // strong
-        UIFont *strongFont = [UIFont fontWithName:@"AvenirNext-Bold" size:15.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : strongFont} forKey:@(STRONG)];
-        
-        // ul
-        NSMutableParagraphStyle* listParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        listParagraphStyle.headIndent = 16.0*self.fontScale;
-        [attributes setObject:@{NSFontAttributeName : paragraphFont,
-                                NSParagraphStyleAttributeName : listParagraphStyle}
-                       forKey:@(BULLETLIST)];
-        
-        // li
-        NSMutableParagraphStyle* listItemParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        listItemParagraphStyle.headIndent = 16.0*self.fontScale;
-        [attributes setObject:@{NSFontAttributeName : paragraphFont,
-                                NSParagraphStyleAttributeName : listItemParagraphStyle}
-                       forKey:@(LISTITEM)];
-        
-        // a
-        UIColor *linkColor = [UIColor blueColor];
-        [attributes setObject:@{NSForegroundColorAttributeName : linkColor}
-                       forKey:@(LINK)];
-        
-        // blockquote
-        NSMutableParagraphStyle* blockquoteParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        blockquoteParagraphStyle.headIndent = 16.0;
-        blockquoteParagraphStyle.tailIndent = 16.0;
-        blockquoteParagraphStyle.firstLineHeadIndent = 16.0;
-        [attributes setObject:@{NSFontAttributeName : [emFont fontWithSize:18.0*self.fontScale], NSParagraphStyleAttributeName : pParagraphStyle} forKey:@(BLOCKQUOTE)];
-        
-        // verbatim (code)
-        NSMutableParagraphStyle* verbatimParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-        verbatimParagraphStyle.headIndent = 12.0;
-        verbatimParagraphStyle.firstLineHeadIndent = 12.0;
-        UIFont *verbatimFont = [UIFont fontWithName:@"CourierNewPSMT" size:14.0*self.fontScale];
-        [attributes setObject:@{NSFontAttributeName : verbatimFont, NSParagraphStyleAttributeName : verbatimParagraphStyle} forKey:@(VERBATIM)];
-        
-        [self.attributeDictionaries setObject:attributes forKey:@"spaced"];
-    }
-    
+    // extra-spaced attributes
+    [self.attributeDictionaries setObject:[self attributesWithAlignment:NSTextAlignmentLeft
+                                                              textScale:1
+                                                       paragraphSpacing:10]
+                                   forKey:@"spaced"];
 }
 
 - (void) updateFontScale

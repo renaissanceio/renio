@@ -39,9 +39,10 @@
 
 - (void) layoutSubviews
 {
+    [super layoutSubviews];
     UIView *subview = self.label;
     CGRect containerFrame = self.frame;
-    CGRect parentFrame = [[self superview] superview].frame;
+    CGRect parentFrame = [self superview].frame;
     CGFloat fullWidth = parentFrame.size.width;
     CGFloat leftInset = containerFrame.origin.x;
     CGFloat rightInset = fullWidth - (containerFrame.origin.x+containerFrame.size.width);

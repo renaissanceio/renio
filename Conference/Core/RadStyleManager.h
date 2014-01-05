@@ -17,8 +17,6 @@
 
 + (instancetype) sharedInstance;
 
-- (NSDictionary *) paragraphAttributesWithTabStops;
-
 - (NSAttributedString *) attributedStringForMarkdown:(NSString *)markdown
                                  withAttributesNamed:(NSString *)attributesName;
 

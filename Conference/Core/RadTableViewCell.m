@@ -60,6 +60,10 @@
         [self.slider removeFromSuperview];
         self.slider = nil;
     }
+    if (self.rightSideLabel) {
+        [self.rightSideLabel removeFromSuperview];
+        self.rightSideLabel = nil;
+    }
 }
 
 - (void) layoutSubviews
@@ -131,6 +135,23 @@
         textLabelFrame.origin.y = offset;
         textLabelFrame.size.height = MAX(self.bounds.size.height - offset,1);
         self.textLabel.frame = textLabelFrame;
+    }
+    
+    id rightMarkdown = [self.contents objectForKey:@"right-markdown"];
+    if (rightMarkdown) {        
+        NSAttributedString *attributedText = [[RadStyleManager sharedInstance]
+                                              attributedStringForMarkdown:rightMarkdown withAttributesNamed:@"right"];
+        CGRect rightSideFrame;
+        rightSideFrame.origin.x = sideMargin;
+        rightSideFrame.size.width = self.bounds.size.width - 2*sideMargin;
+        rightSideFrame.size.height = self.bounds.size.height;
+        if (!self.rightSideLabel) {
+            self.rightSideLabel = [[UILabel alloc] initWithFrame:rightSideFrame];
+            [self addSubview:self.rightSideLabel];
+        }  else {
+            self.rightSideLabel.frame = rightSideFrame;
+        }
+        self.rightSideLabel.attributedText = attributedText;
     }
     
     id imageInfo = [self.contents objectForKey:@"image"];

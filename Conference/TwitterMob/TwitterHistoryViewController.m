@@ -36,17 +36,13 @@
         
         NSMutableArray *rows = [NSMutableArray array];
         
-        NSDictionary *attributes = [[RadStyleManager sharedInstance] paragraphAttributesWithTabStops];
-        
         for (int i = 0; i < [sortedAttendeeRecords count]; i++) {
             AttendeeRecord *record		= [sortedAttendeeRecords objectAtIndex:i];
             NSString *leftText			= record.twitterID;
             NSString *rightText         = [[NSNumber numberWithInteger:record.score] stringValue];
-            NSAttributedString *attributedText =
-            [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\t%@",leftText,rightText]
-                                            attributes:attributes];
             [rows addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                             attributedText, @"attributedText",
+                             [NSString stringWithFormat:@"### %@",leftText], @"markdown",
+                             [NSString stringWithFormat:@"## %@",rightText], @"right-markdown",
                              nil]];
         }
         

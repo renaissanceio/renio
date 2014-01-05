@@ -19,6 +19,7 @@
 @property (nonatomic, strong) RadSlider *slider;
 @property (nonatomic, strong) RadTextView *textView;
 @property (nonatomic, strong) RadTextField *textField;
+@property (nonatomic, strong) UILabel *rightSideLabel;
 
 - (void) resetWithIndexPath:(NSIndexPath *) indexPath controller:(RadTableViewController *) controller;
 
