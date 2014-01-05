@@ -1,0 +1,31 @@
+(import Cocoa)
+
+(task "scale" is
+      (function scale-image (data s)
+                (set image ((NSImage alloc) initWithData:data))
+                (set oldsize (image size))
+                (puts (oldsize description))
+                (set new_w s)
+                (set new_h (* (oldsize 1) (/ new_w (oldsize 0))))
+                (set newsize (list new_w new_h))
+                (set resizedImage ((NSImage alloc) initWithSize:newsize))
+                (resizedImage lockFocus)
+                (image drawInRect:(list 0 0 (newsize 0) (newsize 1))
+                         fromRect:(list 0 0 (oldsize 0) (oldsize 1))
+                        operation:NSCompositeSourceOver
+                         fraction:1.0)
+                (resizedImage unlockFocus)
+                (set resizedData (resizedImage TIFFRepresentation))
+                (set resizedImageRep (NSBitmapImageRep imageRepWithData:resizedData))
+                (set resizedData (resizedImageRep representationUsingType:NSPNGFileType properties:nil))
+                resizedData)
+      (set data (NSData dataWithContentsOfFile:"Icon-1024.png"))
+      (set sizes (array 57 114 72 144 512 60 120 76 152))
+      (sizes each:
+             (do (s)
+                 (set scaled (scale-image data (/ s 2))) ;; since we're running on a retina mac
+                 (scaled writeToFile:"Resources/Icon-#{s}.png" atomically:NO)))
+      nil)
+
+(task "default" => "scale")
+
