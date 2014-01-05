@@ -14,6 +14,5 @@
 @interface TwitterAccountViewController : UITableViewController
 
 - (IBAction)enableAction:(id)sender;
-- (IBAction)disableAction:(id)sender;
 
 @end

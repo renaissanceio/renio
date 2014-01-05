@@ -77,10 +77,4 @@
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)disableAction:(id)sender {
-	[TwitterStore sharedStore].username = nil;
-	
-	[self dismissViewControllerAnimated:YES completion:nil];
-}
-
 @end

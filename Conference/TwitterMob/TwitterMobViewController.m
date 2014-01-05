@@ -7,7 +7,6 @@
 //
 
 #import "TwitterMobViewController.h"
-#import "AppDelegate.h"
 #import "TwitterStore.h"
 #import "Attendee.h"
 #import "AttendeeView.h"
@@ -15,6 +14,7 @@
 #import "AttendeeBrowser.h"
 #import "AttendeeStore.h"
 #import "AttendeeRecord.h"
+#import "TweeStartupView.h"
 
 #define CIRCLE_DIAMETER	200
 #define VERTICAL_BUFFER	0
@@ -25,28 +25,27 @@
 static AttendeeAdvertiser *advertiser;
 
 @implementation TwitterMobViewController {
-	UIView			*contentView;
+	UIView			*zoomView;
 	CGFloat			initialVerticalOffset;
 	NSString		*currentUsername;
 	AttendeeBrowser	*browser;
 	NSTimer			*refreshTimer;
 }
 
-- (instancetype) initWithCoder:(NSCoder *)aDecoder {
-    if (self = [super initWithCoder:aDecoder]) {
-        self.tabBarItem.image = [UIImage imageNamed:@"Twitter.png"];
-        self.title = @"Twee";
-    }
-    return self;
-}
-
 + (UINavigationController *)initialViewController {
 	UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"TwitterMob" bundle:nil];
 	UINavigationController *twitterMob = [storyboard instantiateInitialViewController];
-    twitterMob.tabBarItem.image = [UIImage imageNamed:@"Twitter.png"];
-    twitterMob.title = @"Twee";
-
+	
 	return twitterMob;
+}
+
+- (instancetype) initWithCoder:(NSCoder *)aDecoder {
+	if (self = [super initWithCoder:aDecoder]) {
+		self.tabBarItem.image = [UIImage imageNamed:@"Twitter.png"];
+		
+		self.tabBarItem.title = @"Twee";
+	}
+	return self;
 }
 
 - (void)dealloc {
@@ -59,13 +58,11 @@ static AttendeeAdvertiser *advertiser;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
-//	self.navigationController.navigationBar.barTintColor = [[UIColor blackColor] colorWithAlphaComponent:0.65];
-    
 	CGSize contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height * 3);
-	contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, contentSize.width, contentSize.height)];
-	contentView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+	zoomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, contentSize.width, contentSize.height)];
+	zoomView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight;
 	
-	[self.view addSubview:contentView];
+	[self.scrollView addSubview:zoomView];
 		
 	self.scrollView.contentSize				= contentSize;
 	self.scrollView.minimumZoomScale		= 1.0;
@@ -84,8 +81,8 @@ static AttendeeAdvertiser *advertiser;
 											   object: nil];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-	[super viewDidAppear:animated];
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
 	
 	TwitterStore *twitter = [TwitterStore sharedStore];
 	
@@ -96,6 +93,7 @@ static AttendeeAdvertiser *advertiser;
 		[self removeAllAttendeeViews];
 		
 		if (twitter.username) {
+			[self unloadTweeStartupView];
 			[self startBrowsing];
 		}
 		else {
@@ -105,17 +103,13 @@ static AttendeeAdvertiser *advertiser;
 			advertiser = nil;
 			browser = nil;
 			
-			[self loadTwitterAccounts];
+			[self loadTweeStartupView];
 		}
 	}
 	else {
 		// Fixes the layout bug when we return
 		[self update];
 	}
-}
-
-- (UIScrollView *)scrollView {
-	return (UIScrollView *)self.view;
 }
 
 #pragma mark - Segues
@@ -143,7 +137,7 @@ static AttendeeAdvertiser *advertiser;
 - (AttendeeView *)attendeeViewForAttendee:(Attendee *)attendee {
 	__block AttendeeView *attendeeViewForAttendee;
 	
-	[contentView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+	[zoomView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		AttendeeView *attendeeView = obj;
 		
 		if ([attendeeView.attendee matchesAttendee:attendee]) {
@@ -157,7 +151,7 @@ static AttendeeAdvertiser *advertiser;
 
 - (AttendeeView *)freshAttendeeView {
 	AttendeeView *attendeeView	= [[AttendeeView alloc] initWithFrame:CGRectMake(0, 0, CIRCLE_DIAMETER, CIRCLE_DIAMETER)];
-	attendeeView.center			= CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height);
+	attendeeView.center			= CGPointMake(zoomView.bounds.size.width/2, self.view.bounds.size.height);
 	attendeeView.pulseEnabled	= YES;
 	
 	return attendeeView;
@@ -199,13 +193,13 @@ static AttendeeAdvertiser *advertiser;
 			attendeeView = [self freshAttendeeView];
 			attendeeView.attendee = attendee;
 			
-			[contentView addSubview:attendeeView];
+			[zoomView addSubview:attendeeView];
 		}
 		
 		// Set position of the AttendeeView
 		[UIView animateWithDuration:0.5 animations:^{
 			verticalOffset += attendeeView.frame.size.height/2;
-			attendeeView.center = CGPointMake(self.view.bounds.size.width/2, verticalOffset);
+			attendeeView.center = CGPointMake(zoomView.bounds.size.width/2, verticalOffset);
 			
 			// Setup vertical offset for next AttendeeView
 			verticalOffset += attendeeView.frame.size.height/2 + VERTICAL_BUFFER;
@@ -218,17 +212,17 @@ static AttendeeAdvertiser *advertiser;
 	if (verticalOffset < frameHeight) {
 		verticalOffset = frameHeight + VERTICAL_BUFFER;
 	}
-	self.scrollView.contentSize = CGSizeMake(self.scrollView.contentSize.width, verticalOffset);
+	self.scrollView.contentSize = CGSizeMake(self.scrollView.contentSize.width, verticalOffset * self.scrollView.zoomScale);
 }
 
 - (void)removeAllAttendeeViews {
-	[contentView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+	[zoomView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		[obj removeFromSuperview];
 	}];
 }
 
 - (void)removeOldAttendeeViews {
-	[contentView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+	[zoomView.subviews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		AttendeeView *attendeeView = obj;
 		
 		BOOL attendeeExists = [browser.attendees containsObject:attendeeView.attendee];
@@ -282,21 +276,19 @@ static AttendeeAdvertiser *advertiser;
 #pragma mark - UIScrollViewDelegate
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-    return contentView;
+    return zoomView;
 }
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
-	// Keep circles centered vertically
-	CGPoint newCenter = CGPointMake(self.view.center.x, contentView.center.y);
-	contentView.center = newCenter;
-	
 	self.versionLabel.hidden = (scrollView.zoomScale != 1.0);
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-	// Keep circles centered vertically
-	CGPoint newOffset = CGPointMake(0, scrollView.contentOffset.y);
-	scrollView.contentOffset = newOffset;
+	// Keep zoomView centered horizontally within scrollView
+	CGFloat xOffset = scrollView.bounds.size.width/2 + scrollView.contentOffset.x;
+
+	CGPoint newCenter = CGPointMake(xOffset, zoomView.center.y);
+	zoomView.center = newCenter;
 }
 
 #pragma mark - TwitterStore
@@ -350,6 +342,39 @@ static AttendeeAdvertiser *advertiser;
 	if (!saved) {
 		DLog(@"AttendeeStore could not be saved!");
 	}
+}
+
+#pragma mark - TweeStartupView
+
+- (IBAction)startNowAction:(id)sender {
+	[self loadTwitterAccounts];
+}
+
+- (void)loadTweeStartupView {
+	if (!self.tweeStartupView) {
+		// Storyboards do not load views from NIB files. So we have to do it manually
+		UINib *nib = [UINib nibWithNibName:@"TweeStartupView" bundle:nil];
+		[nib instantiateWithOwner:self options:nil];
+		
+		// Resize width take take advantage of full screen width
+		CGRect newFrame = self.scrollView.bounds;
+		newFrame.size.height = self.tweeStartupView.bounds.size.height;
+		self.tweeStartupView.frame = newFrame;
+		
+		[self.scrollView addSubview:self.tweeStartupView];
+		
+		// Oversize just in case
+		self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, self.tweeStartupView.bounds.size.height) ;
+		self.scrollView.backgroundColor = [UIColor darkGrayColor];
+	}
+}
+
+- (void)unloadTweeStartupView {
+	[self.tweeStartupView removeFromSuperview];
+	self.tweeStartupView = nil;
+	
+	// The default background color when Twee is up and running
+	self.scrollView.backgroundColor = [UIColor lightGrayColor];
 }
 
 @end
