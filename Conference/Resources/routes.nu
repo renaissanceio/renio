@@ -262,10 +262,7 @@
                   (set session nil))
             (else (set surveyname "2014_session")
                   (set session ((Conference sharedInstance) sessionWithName:surveyid))))
-        (puts surveyname)
-        (puts (((Conference sharedInstance) surveys) description))
         (set survey ((Conference sharedInstance) surveyWithName:surveyname))
-        (puts (survey description))
         (set questions (survey surveyquestions:))
         (set sections (array))
         (set rows (array))
@@ -287,6 +284,7 @@
         
         (dict title:(survey title:)
                form:surveyid
+          separator:"none"
     button_topright:(dict text:"Close"
                         action:(do (controller)
                                    ((RadFormDataManager sharedInstance) save)
@@ -316,5 +314,5 @@
                                                  attributes:"spaced")
                                              (dict markdown:"## Start Now"
                                                  attributes:"centered"
-                                                     action:(do (controller) (controller loadTwitterAccounts)))
+                                                     action:(do (controller) (controller presentAccountViewController)))
                                              (dict markdown:"*Your personal history of nearby Twee users is stored locally in this app only. It is never uploaded or shared.*"))))))

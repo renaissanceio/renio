@@ -580,6 +580,17 @@
     }
 }
 
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)sectionIndex
+{
+    NSDictionary *section = [[self.contents objectForKey:@"sections"] objectAtIndex:sectionIndex];
+    NSDictionary *header = [section objectForKey:@"header"];
+    if (header) {
+        return 20 * [RadStyleManager sharedInstance].fontScale;
+    } else {
+        return 0;
+    }
+}
+
 - (NSArray *) sectionIndexTitlesForTableView:(UITableView *)tableView
 {
     return [self.contents objectForKey:@"index"];

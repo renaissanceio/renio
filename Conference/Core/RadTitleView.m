@@ -7,8 +7,7 @@
 //
 
 #import "RadTitleView.h"
-
-
+#import "RadStyleManager.h"
 
 @interface RadTitleView ()
 @property (nonatomic, strong) UILabel *label;
@@ -24,7 +23,8 @@
         self.label.textAlignment = NSTextAlignmentCenter;
         self.label.numberOfLines = 0;
         self.label.textColor = [UIColor whiteColor];
-        self.label.font = [UIFont fontWithName:@"AvenirNext-Bold" size:20.0];
+        self.label.font = [UIFont fontWithName:@"AvenirNext-Bold"
+                                          size:20.0*[[RadStyleManager sharedInstance] deviceTextScale]];
         //self.backgroundColor = [UIColor yellowColor];
         //self.label.backgroundColor = [UIColor redColor];
         [self addSubview:self.label];

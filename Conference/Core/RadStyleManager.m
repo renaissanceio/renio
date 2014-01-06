@@ -185,26 +185,30 @@
     
     [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:0.3 green:0.2 blue:0.1 alpha:1.0]];
     
+    // don't scale, except for iPad
     [[UINavigationBar appearance] setTitleTextAttributes:
      @{NSFontAttributeName:[UIFont fontWithName:@"AvenirNext-Bold"
-                                           size:15.0*self.fontScale]}];
+                                           size:20.0*self.deviceTextScale]}];
+    
     
     [[UIBarButtonItem appearance] setTintColor:[UIColor colorWithRed:1 green:1.0 blue:1.0 alpha:1.0]];
     
+    // don't scale, except for iPad
     [[UIBarButtonItem appearance] setTitleTextAttributes:
      @{NSFontAttributeName:[UIFont fontWithName:@"AvenirNext-Bold"
-                                           size:16.0*self.fontScale]}
+                                           size:16.0*self.deviceTextScale]}
                                                 forState:UIControlStateNormal];
     
-    // don't scale these
+    // don't scale at all
     [[UITabBarItem appearance] setTitleTextAttributes:
      @{NSFontAttributeName:[UIFont fontWithName:@"AvenirNext-DemiBold"
                                            size:12.0]}
                                              forState:UIControlStateNormal];
     
+    // fully scale
     [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil]
      setFont:[UIFont fontWithName:@"AvenirNext-DemiBold"
-                             size:16.0]];
+                             size:16.0*self.fontScale]];
     
     [self prepareAttributeDictionaries];
     
