@@ -143,6 +143,7 @@
                                               attributedStringForMarkdown:rightMarkdown withAttributesNamed:@"right"];
         CGRect rightSideFrame;
         rightSideFrame.origin.x = sideMargin;
+        rightSideFrame.origin.y = 0;
         rightSideFrame.size.width = self.bounds.size.width - 2*sideMargin;
         rightSideFrame.size.height = self.bounds.size.height;
         if (!self.rightSideLabel) {
