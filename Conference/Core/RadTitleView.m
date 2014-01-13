@@ -1,5 +1,5 @@
 //
-//  SmartTitleView.m
+//  RadTitleView.m
 //  #renio
 //
 //  Created by Tim Burks on 11/13/13.
@@ -40,19 +40,33 @@
 - (void) layoutSubviews
 {
     [super layoutSubviews];
-    UIView *subview = self.label;
+
+    CGFloat fullWidth;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    CGRect windowBounds = [[UIScreen mainScreen] bounds];
+    switch (orientation) {
+        case UIInterfaceOrientationLandscapeLeft:
+        case UIInterfaceOrientationLandscapeRight:
+            fullWidth = windowBounds.size.height;
+            break;
+        case UIInterfaceOrientationPortrait:
+        case UIInterfaceOrientationPortraitUpsideDown:
+        default:
+            fullWidth = windowBounds.size.width;
+            break;
+    }
+    
     CGRect containerFrame = self.frame;
-    CGRect parentFrame = [self superview].frame;
-    CGFloat fullWidth = parentFrame.size.width;
     CGFloat leftInset = containerFrame.origin.x;
     CGFloat rightInset = fullWidth - (containerFrame.origin.x+containerFrame.size.width);
     CGFloat inset = MAX(leftInset, rightInset);
     CGFloat subviewOrigin = inset-leftInset;
     CGFloat subviewWidth = fullWidth - 2*inset;
-    CGRect subviewRect = subview.frame;
+    
+    CGRect subviewRect = self.label.frame;
     subviewRect.origin.x = subviewOrigin;
     subviewRect.size.width = subviewWidth;
-    subview.frame = subviewRect;
+    self.label.frame = subviewRect;
 }
 
 @end

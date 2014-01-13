@@ -1,5 +1,5 @@
 //
-//  SmartTitleView.h
+//  RadTitleView.h
 //  #renio
 //
 //  Created by Tim Burks on 11/13/13.
