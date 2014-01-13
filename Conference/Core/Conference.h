@@ -10,7 +10,7 @@
 
 @class RadHTTPResult;
 
-typedef void (^ConnectionCompletionHandler)(NSString *label);
+typedef void (^ConnectionCompletionHandler)(NSString *label, RadHTTPResult *result);
 typedef void (^ConnectionErrorHandler)(RadHTTPResult *result);
 typedef void (^ImageFetchCompletionHandler)(UIImage *image);
 
@@ -21,7 +21,7 @@ typedef void (^ImageFetchCompletionHandler)(UIImage *image);
 @property (nonatomic, strong) NSMutableArray *speakers;
 @property (nonatomic, strong) NSMutableArray *surveys;
 @property (nonatomic, strong) NSMutableArray *pages;
-@property (nonatomic, strong) NSMutableArray *documents;
+@property (nonatomic, strong) NSMutableArray *assets;
 @property (nonatomic, strong) NSMutableArray *sponsors;
 @property (nonatomic, strong) NSMutableArray *news;
 @property (nonatomic, strong) NSMutableArray *properties;
@@ -32,6 +32,7 @@ typedef void (^ImageFetchCompletionHandler)(UIImage *image);
 @property (nonatomic, strong) NSMutableDictionary *sessionsByDay;
 
 + (instancetype) sharedInstance;
+
 + (NSString *) cacheDirectory;
 
 - (void) connectWithCompletionHandler:(ConnectionCompletionHandler) completionHandler
@@ -42,9 +43,6 @@ typedef void (^ImageFetchCompletionHandler)(UIImage *image);
 - (void) cancelAllDownloads;
 
 - (NSDictionary *) speakerWithId:(NSString *) speakerId;
-
-- (NSArray *) alphabetizedSpeakersForYear:(int) year;
-
 - (NSDictionary *) speakerWithName:(NSString *) name;
 - (NSDictionary *) sessionWithName:(NSString *) name;
 - (NSDictionary *) newsItemWithName:(NSString *) name;

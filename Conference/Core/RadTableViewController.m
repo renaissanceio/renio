@@ -315,7 +315,6 @@
         cell.textLabel.attributedText = attributedText;
     } else {
         NSString *markdown = [row objectForKey:@"markdown"];
-        CGFloat width = self.tableView.bounds.size.width;
         if (markdown) {
             NSString *attributes = [row objectForKey:@"attributes"];
             cell.textLabel.attributedText = [[RadStyleManager sharedInstance]
@@ -502,8 +501,12 @@
                 controller.contents = page;
                 childController = controller;
             } else {
-                RadWebViewController *controller = [[RadWebViewController alloc] initWithParameterString:path];
-                childController = controller;
+                Class ControllerClass = NSClassFromString(path);
+                if (ControllerClass) {
+                    childController = [[ControllerClass alloc] init];
+                } else {
+                    childController = [[RadWebViewController alloc] initWithParameterString:path];
+                }
             }
             if ([verb isEqualToString:@"push"]) {
                 [self.navigationController pushViewController:childController animated:YES];

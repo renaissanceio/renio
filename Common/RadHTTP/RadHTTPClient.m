@@ -82,11 +82,13 @@ static int activityCount = 0;
 
 - (RadHTTPResult *) connectSynchronously
 {
+    dispatch_async(dispatch_get_main_queue(),^{[RadHTTPClient retainNetworkActivityIndicator];});
     NSError *error;
     NSHTTPURLResponse *response;
     NSData *data = [NSURLConnection sendSynchronousRequest:self.request
                                          returningResponse:&response
                                                      error:&error];
+    dispatch_async(dispatch_get_main_queue(),^{[RadHTTPClient releaseNetworkActivityIndicator];});
     return [[RadHTTPResult alloc] initWithData:data response:response error:error];
 }
 @end

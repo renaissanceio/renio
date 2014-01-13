@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2206DCA01883746B0063B961 /* 258-checkmark.png in Resources */ = {isa = PBXBuildFile; fileRef = 2206DC9E1883746B0063B961 /* 258-checkmark.png */; };
+		2206DCA11883746B0063B961 /* 258-checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2206DC9F1883746B0063B961 /* 258-checkmark@2x.png */; };
+		2206DCA61883747E0063B961 /* 269-happyface.png in Resources */ = {isa = PBXBuildFile; fileRef = 2206DCA21883747E0063B961 /* 269-happyface.png */; };
+		2206DCA71883747E0063B961 /* 269-happyface@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2206DCA31883747E0063B961 /* 269-happyface@2x.png */; };
+		2206DCA81883747E0063B961 /* 270-unhappyface.png in Resources */ = {isa = PBXBuildFile; fileRef = 2206DCA41883747E0063B961 /* 270-unhappyface.png */; };
+		2206DCA91883747E0063B961 /* 270-unhappyface@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2206DCA51883747E0063B961 /* 270-unhappyface@2x.png */; };
 		2209C0A51833EA02000CD66A /* RadDownloadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2209C0A41833EA02000CD66A /* RadDownloadViewController.m */; };
 		2209C0A818342359000CD66A /* RadTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2209C0A718342359000CD66A /* RadTitleView.m */; };
 		2209C0AB18347E9F000CD66A /* RadNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2209C0AA18347E9F000CD66A /* RadNavigationController.m */; };
@@ -50,6 +56,7 @@
 		225E49C71878E14900073130 /* 01-refresh.png in Resources */ = {isa = PBXBuildFile; fileRef = 225E49C51878E14900073130 /* 01-refresh.png */; };
 		225E49C81878E14900073130 /* 01-refresh@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225E49C61878E14900073130 /* 01-refresh@2x.png */; };
 		22782DF918305A8B00C4CF29 /* NSMutableString+SafeAppend.m in Sources */ = {isa = PBXBuildFile; fileRef = 22782DF818305A8B00C4CF29 /* NSMutableString+SafeAppend.m */; };
+		227DB94C1883266300E02C00 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 227DB94B1883266300E02C00 /* Settings.bundle */; };
 		2280D91F183F10DA00D43FBB /* routes.nu in Resources */ = {isa = PBXBuildFile; fileRef = 2280D91E183F10DA00D43FBB /* routes.nu */; };
 		229610A3182DB12100400C7C /* compile.c in Sources */ = {isa = PBXBuildFile; fileRef = 22961098182DB12100400C7C /* compile.c */; };
 		229610A4182DB12100400C7C /* markdown_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 2296109B182DB12100400C7C /* markdown_lib.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -84,6 +91,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2206DC9E1883746B0063B961 /* 258-checkmark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "258-checkmark.png"; sourceTree = "<group>"; };
+		2206DC9F1883746B0063B961 /* 258-checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "258-checkmark@2x.png"; sourceTree = "<group>"; };
+		2206DCA21883747E0063B961 /* 269-happyface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "269-happyface.png"; sourceTree = "<group>"; };
+		2206DCA31883747E0063B961 /* 269-happyface@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "269-happyface@2x.png"; sourceTree = "<group>"; };
+		2206DCA41883747E0063B961 /* 270-unhappyface.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "270-unhappyface.png"; sourceTree = "<group>"; };
+		2206DCA51883747E0063B961 /* 270-unhappyface@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "270-unhappyface@2x.png"; sourceTree = "<group>"; };
 		2209C0A31833EA02000CD66A /* RadDownloadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = RadDownloadViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		2209C0A41833EA02000CD66A /* RadDownloadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RadDownloadViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		2209C0A618342359000CD66A /* RadTitleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = RadTitleView.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -146,6 +159,7 @@
 		225E49C61878E14900073130 /* 01-refresh@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "01-refresh@2x.png"; sourceTree = "<group>"; };
 		22782DF718305A8B00C4CF29 /* NSMutableString+SafeAppend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSMutableString+SafeAppend.h"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		22782DF818305A8B00C4CF29 /* NSMutableString+SafeAppend.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSMutableString+SafeAppend.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		227DB94B1883266300E02C00 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		2280D91E183F10DA00D43FBB /* routes.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = routes.nu; sourceTree = "<group>"; };
 		22961098182DB12100400C7C /* compile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compile.c; sourceTree = "<group>"; };
 		22961099182DB12100400C7C /* greg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = greg.h; sourceTree = "<group>"; };
@@ -258,6 +272,12 @@
 				2251D5D8182C8CFF006B6190 /* 190-bank@2x.png */,
 				225E49C11878D8B700073130 /* 209-twitter.png */,
 				225E49C21878D8B700073130 /* 209-twitter@2x.png */,
+				2206DC9E1883746B0063B961 /* 258-checkmark.png */,
+				2206DC9F1883746B0063B961 /* 258-checkmark@2x.png */,
+				2206DCA21883747E0063B961 /* 269-happyface.png */,
+				2206DCA31883747E0063B961 /* 269-happyface@2x.png */,
+				2206DCA41883747E0063B961 /* 270-unhappyface.png */,
+				2206DCA51883747E0063B961 /* 270-unhappyface@2x.png */,
 				2209C0AC183497F5000CD66A /* icon-large.png */,
 				2251D5E5182C8F52006B6190 /* icon.png */,
 				22DE2B051836FBCD0002E9BB /* no.png */,
@@ -377,6 +397,7 @@
 				22AC95191827727700CF3379 /* Info.plist */,
 				22AC951A1827727700CF3379 /* main.m */,
 				22AC951B1827727700CF3379 /* Prefix.pch */,
+				227DB94B1883266300E02C00 /* Settings.bundle */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -528,6 +549,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2206DCA01883746B0063B961 /* 258-checkmark.png in Resources */,
+				2206DCA81883747E0063B961 /* 270-unhappyface.png in Resources */,
 				2251D5DC182C8CFF006B6190 /* 137-presentation@2x.png in Resources */,
 				2209C0AD183497F5000CD66A /* icon-large.png in Resources */,
 				225A62AA187905EE009A7DA4 /* Twitter.png in Resources */,
@@ -537,17 +560,22 @@
 				225A62AB187905EE009A7DA4 /* Twitter@2x.png in Resources */,
 				2251D5E1182C8CFF006B6190 /* 190-bank.png in Resources */,
 				22DE2B061836FBCD0002E9BB /* no.png in Resources */,
+				2206DCA11883746B0063B961 /* 258-checkmark@2x.png in Resources */,
 				22AC951F1827727700CF3379 /* InfoPlist.strings in Resources */,
 				222EB5F4183745FF004CDD51 /* rounded-256.png in Resources */,
 				225E49C71878E14900073130 /* 01-refresh.png in Resources */,
+				2206DCA61883747E0063B961 /* 269-happyface.png in Resources */,
 				2251D5DF182C8CFF006B6190 /* 166-newspaper.png in Resources */,
 				2251D5E0182C8CFF006B6190 /* 166-newspaper@2x.png in Resources */,
 				2251D5E8182C90B6006B6190 /* seedling.png in Resources */,
+				2206DCA91883747E0063B961 /* 270-unhappyface@2x.png in Resources */,
 				2251D5E6182C8F52006B6190 /* icon.png in Resources */,
+				227DB94C1883266300E02C00 /* Settings.bundle in Resources */,
 				225E49C01878D88400073130 /* 32-circle-south@2x.png in Resources */,
 				225E49C81878E14900073130 /* 01-refresh@2x.png in Resources */,
 				225E49C41878D8B700073130 /* 209-twitter@2x.png in Resources */,
 				2251D5E2182C8CFF006B6190 /* 190-bank@2x.png in Resources */,
+				2206DCA71883747E0063B961 /* 269-happyface@2x.png in Resources */,
 				225E49C31878D8B700073130 /* 209-twitter.png in Resources */,
 				2251D5DB182C8CFF006B6190 /* 137-presentation.png in Resources */,
 				22DE2B041836FBC80002E9BB /* yes.png in Resources */,
@@ -631,7 +659,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tim Burks (53Z922U3KK)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Conference/Supporting/Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -651,7 +679,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Conference/Supporting/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "AA3737F8-00BC-4BA2-8F96-A7525B9D48C6";
+				PROVISIONING_PROFILE = "1BBE49BE-63A1-42C5-99A6-632AD5A65D1A";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};

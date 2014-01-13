@@ -3,12 +3,14 @@
 
 (render "download"
         (dict title:"#renio"
-              image:"32-circle-south.png"
     button_topright:(dict image:"01-refresh.png" action:"modal RadDownloadViewController")
            sections:(array (dict rows:(array
                                             (dict image:(dict filename:"icon-large.png" position:"top")
                                                markdown:"# Download Required\n\nThis app must download additional information before it can be used. To proceed, please be sure that you are connected to the internet."
-                                             attributes:"centered"))))))
+                                             attributes:"centered")
+                                            (dict markdown:"## Begin Downloading"
+                                                attributes:"centered"
+                                                    action:"modal RadDownloadViewController"))))))
 
 (def row-for-sponsor (sponsor)
      (set row (dict markdown:(+ "*" (sponsor acknowledgement:)
@@ -26,12 +28,20 @@
      row)
 
 (render "sponsors"
+        (set sponsor-rows (array))
+        (set donor-rows (array))
+        (((Conference sharedInstance) sponsors) each:
+         (do (sponsor)
+             ((if (sponsor paid:)
+                  (then sponsor-rows)
+                  (else donor-rows)) addObject:(row-for-sponsor sponsor))))
         (dict title:"Sponsors"
               image:"190-bank.png"
             refresh:(do (controller)
-                        (dict sections:(array (dict rows:((((Conference sharedInstance) sponsors) map:
-                                                           (do (sponsor)
-                                                               (row-for-sponsor sponsor))))))))))
+                        (dict sections:(array (dict header:(dict text:"Financial Supporters")
+                                                      rows:sponsor-rows)
+                                              (dict header:(dict text:"Prize Donors")
+                                                      rows:donor-rows))))))
 
 (render "sponsors/sponsorid:"
         (set sponsor ((Conference sharedInstance) sponsorWithName:sponsorid))
@@ -47,19 +57,29 @@
                              position:"top"
                                  mask:"none")))
         (rows addObject:row)
+        (if (and (set twitterid (sponsor twitterid:))
+                 (twitterid isKindOfClass:NSString))
+            (rows addObject:(dict markdown:(+ "On Twitter\n## @" twitterid)
+                                    action:(+ "modal http://twitter.com/" twitterid))))
         (if (and (set link (sponsor url:))
                  (link isKindOfClass:NSString))
             (rows addObject:(dict markdown:(+ "On the web\n## " link)
                                     action:(+ "modal " link))))
         (dict title:(sponsor title:)
+          separator:"none"
            sections:(array (dict rows:rows))))
 
+(set newsDayFormatter (NSDateFormatter new))
+(newsDayFormatter setDateFormat:"EEEE MMM dd, yyyy")
+
 (def row-for-news (item)
+     (set itemDate (NSDate dateWithTimeIntervalSince1970:(/ (item created:) 1000)))
      (set markdown (+ "# "
                       (item title:)
                       "\n\n*"
                       (item summary:)
-                      "*\n\n"))
+                      "*\n\n"
+                      (newsDayFormatter stringFromDate:itemDate)))
      (set row (dict markdown:markdown
                   attributes:"small"
                       action:"push news/#{(item name:)}"))
@@ -79,21 +99,30 @@
 
 (render "news/itemid:"
         (set item ((Conference sharedInstance) newsItemWithName:itemid))
+        (set itemDate (NSDate dateWithTimeIntervalSince1970:(/ (item created:) 1000)))
         (set rows (array))
-        (set markdown (+ "# " (item title:) "\n\n*" (item summary:) "*\n\n" (item details:) "\n\n"))
+        ;; item header
+        (set markdown (+ "# " (item title:) "\n\n"
+                         "*" (item summary:) "*\n\n"
+                         (newsDayFormatter stringFromDate:itemDate)))
         (set row (dict markdown:markdown
-                     attributes:"spaced"))
+                     attributes:"default"))
         (if (and (set image (item image:))
                  (image isKindOfClass:NSString))
             (row image:(dict filename:image
                              position:"top"
-                                 mask:"none"))
-            (rows addObject:row)
-            (if (and (set URL (item url:))
-                     (URL isKindOfClass:NSString))
-                (rows addObject:(dict markdown:(+ "## On the web\n**" URL "**")
-                                        action:(+ "modal " URL)))))
+                                 mask:"none")))
+        (rows addObject:row)
+        ;; item body
+        (rows addObject:(dict markdown:(item details:)
+                            attributes:"spaced"))
+        ;; optional link
+        (if (and (set URL (item url:))
+                 (URL isKindOfClass:NSString))
+            (rows addObject:(dict markdown:(+ "## On the web\n**" URL "**")
+                                    action:(+ "modal " URL))))
         (dict title:(item title:)
+          separator:"none"
            sections:(array (dict rows:rows))))
 
 (render "sessions/year:/day/day:"

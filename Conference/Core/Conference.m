@@ -6,10 +6,10 @@
 //  Copyright (c) 2013 Radtastical Inc Inc. All rights reserved.
 //
 
-#import "Conference.h"
-#import "UGConnection.h"
 #import "RadHTTP.h"
 #import "RadRequestRouter.h"
+#import "UGConnection.h"
+#import "Conference.h"
 
 @interface Conference ()
 @property (nonatomic, strong) NSOperationQueue *downloadQueue;
@@ -30,21 +30,38 @@
 - (instancetype) init
 {
     if (self = [super init]) {
-        
         self.usergrid = [UGConnection sharedInstance];
-        self.usergrid.organization = @"radtastical";
-        self.usergrid.application = @"renaissance";
+        
+        NSString *usergridServer = [[NSUserDefaults standardUserDefaults] valueForKey:@"usergrid_server"];
+        NSString *usergridOrganization = [[NSUserDefaults standardUserDefaults] valueForKey:@"usergrid_organization"];
+        NSString *usergridApplication = [[NSUserDefaults standardUserDefaults] valueForKey:@"usergrid_application"];
+        NSNumber *usergridHTTPS = [[NSUserDefaults standardUserDefaults] valueForKey:@"usergrid_https"];
+        
+        if (!usergridServer) usergridServer = @"api.usergrid.com";
+        if (!usergridOrganization) usergridOrganization = @"radtastical";
+        if (!usergridApplication) usergridApplication = @"renaissance";
+        if (!usergridHTTPS) usergridHTTPS = @(YES);
+        
+        if ([usergridHTTPS boolValue]) {
+            self.usergrid.server = [@"https://" stringByAppendingString:usergridServer];
+        } else {
+            self.usergrid.server = [@"http://" stringByAppendingString:usergridServer];
+        }
+        self.usergrid.organization = usergridOrganization;
+        self.usergrid.application = usergridApplication;
         
         self.downloadQueue = [[NSOperationQueue alloc] init];
         [self.downloadQueue setMaxConcurrentOperationCount:2];
         
-        [self loadPagesFromFile];
-        [self loadSessionsFromFile];
-        [self loadSpeakersFromFile];
-        [self loadNewsFromFile];
-        [self loadSurveysFromFile];
-        [self loadSponsorsFromFile];
-        [self loadPropertiesFromFile];
+        for (NSString *collectionName in @[@"pages",
+                                           @"sessions",
+                                           @"speakers",
+                                           @"news",
+                                           @"surveys",
+                                           @"sponsors",
+                                           @"properties"]) {
+            [self loadFileForCollection:collectionName];
+        }
     }
     return self;
 }
@@ -68,69 +85,24 @@
     return [[[Conference cacheDirectory] stringByAppendingPathComponent:collectionName] stringByAppendingPathExtension:@".json"];
 }
 
-- (void) loadSessionsFromFile
+- (void) loadFileForCollection:(NSString *) collectionName
 {
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"sessions"]];
+    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:collectionName]];
     if (data) {
         id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.sessions = [object objectForKey:@"entities"];
+        [self setValue:[object objectForKey:@"entities" ] forKey:collectionName];
     }
-    [self processSessions];
+    [self processCollection:collectionName];
 }
 
-- (void) loadSpeakersFromFile
+- (void) processCollection:(NSString *) collectionName
 {
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"speakers"]];
-    if (data) {
-        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.speakers = [object objectForKey:@"entities"];
-    }
-    [self processSpeakers];
-}
-
-- (void) loadPagesFromFile
-{
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"pages"]];
-    if (data) {
-        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.pages = [object objectForKey:@"entities"];
-    }
-    [self processPages];
-}
-
-- (void) loadSponsorsFromFile
-{
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"sponsors"]];
-    if (data) {
-        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.sponsors = [object objectForKey:@"entities"];
-    }
-}
-
-- (void) loadPropertiesFromFile
-{
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"properties"]];
-    if (data) {
-        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.properties = [object objectForKey:@"entities"];
-    }
-}
-
-- (void) loadNewsFromFile
-{
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"news"]];
-    if (data) {
-        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.news = [object objectForKey:@"entities"];
-    }
-}
-
-- (void) loadSurveysFromFile
-{
-    NSData *data = [NSData dataWithContentsOfFile:[self fileNameForCollection:@"surveys"]];
-    if (data) {
-        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        self.surveys = [object objectForKey:@"entities"];
+    if ([collectionName isEqualToString:@"speakers"]) {
+        [self processSpeakers];
+    } else if ([collectionName isEqualToString:@"sessions"]) {
+        [self processSessions];
+    } else if ([collectionName isEqualToString:@"pages"]) {
+        [self processPages];
     }
 }
 
@@ -193,11 +165,6 @@
     }
 }
 
-- (NSArray *) alphabetizedSpeakersForYear:(int) year
-{
-    return [self.alphabetizedSpeakers objectForKey:@(year)];
-}
-
 - (void) processPages
 {
     for (NSDictionary *page in self.pages) {
@@ -208,13 +175,14 @@
 - (void) connectWithCompletionHandler:(ConnectionCompletionHandler) handler
                          errorHandler:(ConnectionErrorHandler) errorHandler
 {
+#ifdef AUTHENTICATE
     [RadHTTPClient connectWithRequest:
      [self.usergrid getAccessTokenForApplicationWithUsername:@"wemakeapps"
                                                     password:@"renaissanceio"]
                     completionHandler:^(RadHTTPResult *result) {
                         if (result.statusCode == 200) {
                             [self.usergrid authenticateWithResult:result];
-                            
+#endif
                             [RadHTTPClient connectWithRequest:
                              [self.usergrid getEntitiesInCollection:@"properties" limit:100]
                                             completionHandler:^(RadHTTPResult *result) {
@@ -222,40 +190,42 @@
                                                     [[result data] writeToFile:[self fileNameForCollection:@"properties"]
                                                                     atomically:YES];
                                                     self.properties = [[result object] objectForKey:@"entities"];
-                                                    handler(@"Done");
+                                                    handler(@"Done", result);
                                                 } else {
                                                     errorHandler(result);
                                                 }
                                             }];
+#ifdef AUTHENTICATE
                         } else {
                             errorHandler(result);
                         }
                     }];
+#endif
 }
 
 - (void) refreshConferenceWithCompletionHandler:(ConnectionCompletionHandler) handler
 {
     NSArray *operations = @[
                             [NSBlockOperation blockOperationWithBlock:^{
-                                [self refreshSessionList:handler];
-                            }],
-                            [NSBlockOperation blockOperationWithBlock:^{
-                                [self refreshSpeakerList:handler];
-                            }],
-                            [NSBlockOperation blockOperationWithBlock:^{
-                                [self refreshSurveys:handler];
-                            }],
-                            [NSBlockOperation blockOperationWithBlock:^{
-                                [self refreshSponsors:handler];
-                            }],
-                            [NSBlockOperation blockOperationWithBlock:^{
-                                [self refreshNews:handler];
-                            }],
-                            [NSBlockOperation blockOperationWithBlock:^{
                                 [self refreshImageFolder:handler];
                             }],
                             [NSBlockOperation blockOperationWithBlock:^{
-                                [self refreshPages:handler];
+                                [self refreshCollection:@"sessions" handler:handler];
+                            }],
+                            [NSBlockOperation blockOperationWithBlock:^{
+                                [self refreshCollection:@"speakers" handler:handler];
+                            }],
+                            [NSBlockOperation blockOperationWithBlock:^{
+                                [self refreshCollection:@"surveys" handler:handler];
+                            }],
+                            [NSBlockOperation blockOperationWithBlock:^{
+                                [self refreshCollection:@"sponsors" handler:handler];
+                            }],
+                            [NSBlockOperation blockOperationWithBlock:^{
+                                [self refreshCollection:@"news" handler:handler];
+                            }],
+                            [NSBlockOperation blockOperationWithBlock:^{
+                                [self refreshCollection:@"pages" handler:handler];
                             }]];
     for (NSOperation *operation in operations) {
         operation.queuePriority = NSOperationQueuePriorityVeryHigh;
@@ -263,102 +233,52 @@
     }
 }
 
-- (void) refreshSessionList:(ConnectionCompletionHandler)handler
+- (void) refreshCollection:(NSString *) collectionName
+                   handler:(ConnectionCompletionHandler)handler
 {
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"sessions" limit:100];
+    NSMutableURLRequest *queryRequest;
+    if ([collectionName isEqualToString:@"news"]) {
+        queryRequest = [self.usergrid getEntitiesInCollection:@"newsitems"
+                                                   usingQuery:@{@"limit":@100,
+                                                                @"ql":@"select * order by created desc"}];
+    } else if ([collectionName isEqualToString:@"sponsors"]) {
+        queryRequest = [self.usergrid getEntitiesInCollection:@"sponsors"
+                                                   usingQuery:@{@"limit":@100,
+                                                                @"ql":@"select * order by displayorder asc"}];
+    } else {
+        queryRequest = [self.usergrid getEntitiesInCollection:collectionName limit:100];
+    }
     RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
     RadHTTPResult *result = [client connectSynchronously];
     if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"sessions"] atomically:YES];
-        self.sessions = [[result object] objectForKey:@"entities"];
-        [self processSessions];
-    } else {
-        NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
+        [[result data] writeToFile:[self fileNameForCollection:collectionName] atomically:YES];
+        [self setValue:[[result object] objectForKey:@"entities"] forKey:collectionName];
+        [self processCollection:collectionName];
     }
     if (handler) {
-        handler(@"Sessions");
+        handler([collectionName capitalizedString], result);
     }
 }
 
-- (void) refreshSpeakerList:(ConnectionCompletionHandler)handler
+- (NSString *) imageFolderName
 {
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"speakers" limit:100];
-    RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
-    RadHTTPResult *result = [client connectSynchronously];
-    if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"speakers"] atomically:YES];
-        self.speakers = [[result object] objectForKey:@"entities"];
-        [self processSpeakers];
-    } else {
-        NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
-    }
-    if (handler) {
-        handler(@"Speakers");
-    }
-}
-
-- (void) refreshSponsors:(ConnectionCompletionHandler) handler
-{
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"sponsors" limit:100];
-    RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
-    RadHTTPResult *result = [client connectSynchronously];
-    if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"sponsors"] atomically:YES];
-        self.sponsors = [[result object] objectForKey:@"entities"];
-    } else {
-        NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
-    }
-    if (handler) {
-        handler(@"Sponsors");
-    }
-}
-
-- (void) refreshPages:(ConnectionCompletionHandler) handler
-{
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"pages" limit:100];
-    RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
-    RadHTTPResult *result = [client connectSynchronously];
-    if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"pages"] atomically:YES];
-        self.pages = [[result object] objectForKey:@"entities"];
-        [self processPages];
-    } else {
-        NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
-    }
-    if (handler) {
-        handler(@"Pages");
-    }
-}
-
-- (void) refreshNews:(ConnectionCompletionHandler) handler
-{
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"newsitems" limit:100];
-    RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
-    RadHTTPResult *result = [client connectSynchronously];
-    if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"news"] atomically:YES];
-        self.news = [[result object] objectForKey:@"entities"];
-    } else {
-        NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
-    }
-    if (handler) {
-        handler(@"News");
-    }
+    return [[Conference cacheDirectory] stringByAppendingPathComponent:@"images"];
 }
 
 - (void) refreshImageFolder:(ConnectionCompletionHandler) handler
 {
-    [[NSFileManager defaultManager]
-     createDirectoryAtPath:
-     [[Conference cacheDirectory] stringByAppendingPathComponent:@"images"]
-     withIntermediateDirectories:YES attributes:nil error:NULL];
+    // ensure that a directory exists to store images
+    [[NSFileManager defaultManager] createDirectoryAtPath:[self imageFolderName]
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:NULL];
     
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"assets" limit:100];
+    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"assets" limit:200];
     RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
     RadHTTPResult *result = [client connectSynchronously];
     if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"documents"] atomically:YES];
-        self.documents = [[result object] objectForKey:@"entities"];
+        [[result data] writeToFile:[self fileNameForCollection:@"assets"] atomically:YES];
+        self.assets = [[result object] objectForKey:@"entities"];
         
         if (YES) {
             for (NSDictionary *asset in [[result object] objectForKey:@"entities"]) {
@@ -397,12 +317,12 @@
                     [self.downloadQueue addOperation:operation];
                 }
             }
-        }        
+        }
     } else {
         NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
     }
     if (handler) {
-        handler(@"Images");
+        handler(@"Images", result);
     }
 }
 
@@ -425,10 +345,10 @@
     }
     
     // otherwise, we try to download it
-    for (NSDictionary *document in self.documents) {
+    for (NSDictionary *document in self.assets) {
         if ([name isEqualToString:[document objectForKey:@"path"]]) {
             NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-                // NSLog(@"fetching %@ BEGIN", document);
+                DLog(@"fetching %@ BEGIN", document);
                 NSMutableURLRequest *request = [self.usergrid getDataForAsset:[document objectForKey:@"uuid"]];
                 RadHTTPResult *result = [RadHTTPClient connectSynchronouslyWithRequest:request];
                 NSString *fileName =
@@ -436,34 +356,19 @@
                   stringByAppendingPathComponent:@"images"]
                  stringByAppendingPathComponent:[document objectForKey:@"path"]];
                 if (result.statusCode == 200) {
-                    // NSLog(@"got %@", fileName);
+                    DLog(@"got %@", fileName);
                     NSData *imageData = [result data];
                     [imageData writeToFile:fileName atomically:NO];
                     UIImage *image = [UIImage imageWithData:imageData];
                     handler(image);
                 } else {
-                    NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
+                    DLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
                 }
-                //NSLog(@"fetching %@ END", name);
+                DLog(@"fetching %@ END", name);
             }];
             operation.queuePriority = NSOperationQueuePriorityHigh;
             [self.downloadQueue addOperation:operation];
         }
-    }
-}
-
-- (void) refreshSurveys:(ConnectionCompletionHandler) handler {
-    NSMutableURLRequest *queryRequest = [self.usergrid getEntitiesInCollection:@"surveys" limit:100];
-    RadHTTPClient *client = [[RadHTTPClient alloc] initWithRequest:queryRequest];
-    RadHTTPResult *result = [client connectSynchronously];
-    if (result.statusCode == 200) {
-        [[result data] writeToFile:[self fileNameForCollection:@"surveys"] atomically:YES];
-        self.surveys = [[result object] objectForKey:@"entities"];
-    } else {
-        NSLog(@"RESPONSE %d %@", (int) result.statusCode, [result UTF8String]);
-    }
-    if (handler) {
-        handler(@"Surveys");
     }
 }
 
@@ -539,6 +444,10 @@
     return nil;
 }
 
+- (NSArray *) alphabetizedSpeakersForYear:(int) year
+{
+    return [self.alphabetizedSpeakers objectForKey:@(year)];
+}
 
 @end
 

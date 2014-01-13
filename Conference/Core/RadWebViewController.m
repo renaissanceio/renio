@@ -8,10 +8,11 @@
 
 #import "RadWebViewController.h"
 
-@interface RadWebViewController ()
+@interface RadWebViewController () <UIWebViewDelegate>
 @property (nonatomic, strong) UIToolbar *topBar;
 @property (nonatomic, strong) UIWebView *webView;
 @property (nonatomic, strong) NSString *path;
+@property (nonatomic, strong) UIActivityIndicatorView *activityIndicatorView;
 @end
 
 @implementation RadWebViewController
@@ -85,8 +86,18 @@
     webViewFrame.size.height -= 64;
     self.webView = [[UIWebView alloc] initWithFrame:webViewFrame];
     [self.view addSubview:self.webView];
-    
+    self.webView.delegate = self;
     [self loadPath:self.path];
+    
+    self.activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    CGSize activityIndicatorSize = self.activityIndicatorView.frame.size;
+    CGRect activityIndicatorFrame = CGRectMake(0.5*(self.view.bounds.size.width - activityIndicatorSize.width),
+                                               0.5*(self.view.bounds.size.height - activityIndicatorSize.height),
+                                               activityIndicatorSize.width,
+                                               activityIndicatorSize.height);
+    self.activityIndicatorView.frame = activityIndicatorFrame;
+    [self.activityIndicatorView startAnimating];
+    [self.view addSubview:self.activityIndicatorView];
 }
 
 - (void) goBack:(id) sender
@@ -106,10 +117,7 @@
 
 - (void) close:(id) sender
 {
-    [self dismissViewControllerAnimated:YES completion:^{
-        
-        
-    }];
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void) loadPath:(NSString *) path
@@ -118,4 +126,10 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     [self.webView loadRequest:request];
 }
+
+- (void) webViewDidFinishLoad:(UIWebView *)webView
+{
+    [self.activityIndicatorView stopAnimating];
+}
+
 @end

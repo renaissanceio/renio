@@ -66,7 +66,7 @@
 - (void) applicationDidBecomeActive:(UIApplication *)application
 {
     // connect to online data store
-    [[Conference sharedInstance] connectWithCompletionHandler:^(NSString *message) {
+    [[Conference sharedInstance] connectWithCompletionHandler:^(NSString *message, RadHTTPResult *result) {
         
         NSNumber *localUpdateTime = [[NSUserDefaults standardUserDefaults] objectForKey:@"updateTime"];
         
@@ -101,8 +101,8 @@
             // no network connection
         } else {
             UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:@"Unable to connect"
-                                  message:@"We're unable to connect to the server."
+                                  initWithTitle:@"We're disconnected."
+                                  message:@"We're unable to connect to our server. That's ok, but we'll only be able to show you things that we've previously downloaded."
                                   delegate:nil
                                   cancelButtonTitle:@"OK"
                                   otherButtonTitles:nil];

@@ -32,7 +32,7 @@ static NSString *boolean_representation(BOOL value)
 
 - (id) init {
     if (self = [super init]) {
-        self.server = @"http://api.usergrid.com";
+        self.server = @"https://api.usergrid.com";
     }
     return self;
 }
