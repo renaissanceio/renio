@@ -1,7 +1,7 @@
 /*!
  @header Nu.h
  @discussion Nu.
- @copyright Copyright (c) 2007-2013 Radtastical Inc.
+ @copyright Copyright (c) 2007-2014 Radtastical Inc.
  
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

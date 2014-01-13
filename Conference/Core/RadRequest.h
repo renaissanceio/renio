@@ -1,6 +1,6 @@
 //
 //  RadRequest.h
-//  RAD
+//  #renio
 //
 //  Created by Tim Burks on 2/15/11.
 //  Copyright 2011 Radtastical, Inc. All rights reserved.

@@ -76,15 +76,7 @@
             
             if (!localUpdateTime) {
                 [self attemptDownload];
-                /*
-                UIAlertView *alert = [[UIAlertView alloc]
-                                      initWithTitle:@"Important updates are available."
-                                      message:@"Download them now?"
-                                      delegate:self
-                                      cancelButtonTitle:@"NO"
-                                      otherButtonTitles:@"YES", nil];
-                [alert show];
-                 */
+                            
                 
             } else if ([self.remoteUpdateTime compare:localUpdateTime] == NSOrderedDescending) {
                 UIAlertView *alert = [[UIAlertView alloc]
