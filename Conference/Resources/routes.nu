@@ -1,3 +1,20 @@
+;; routes.nu
+;;
+;;  Created by Tim Burks
+;;  Copyright (c) 2014 Radtastical Inc. All rights reserved.
+;;
+;;  Licensed under the Apache License, Version 2.0 (the "License");
+;;  you may not use this file except in compliance with the License.
+;;  You may obtain a copy of the License at
+;;
+;;  http://www.apache.org/licenses/LICENSE-2.0
+;;
+;;  Unless required by applicable law or agreed to in writing, software
+;;  distributed under the License is distributed on an "AS IS" BASIS,
+;;  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;;  See the License for the specific language governing permissions and
+;;  limitations under the License.
+
 (render "main"
         (dict tabs:(array "download")))
 
@@ -71,6 +88,7 @@
 
 (set newsDayFormatter (NSDateFormatter new))
 (newsDayFormatter setDateFormat:"EEEE MMM dd, yyyy")
+(newsDayFormatter setTimeZone:(NSTimeZone timeZoneWithName:"PST"))
 
 (def row-for-news (item)
      (set itemDate (NSDate dateWithTimeIntervalSince1970:(/ (item created:) 1000)))
@@ -134,15 +152,18 @@
                                                 (do (session) (row-for-session session)))))))
 
 (render "sessions/year:/sessionname:"
-        (set session ((Conference sharedInstance) sessionWithName:sessionname))
-        
-        (set sections (array))
+        (set timezone (NSTimeZone timeZoneWithName:"PST"))
         (set dateParser (NSDateFormatter new))
         (dateParser setDateFormat:"yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         (set timeFormatter (NSDateFormatter new))
         (timeFormatter setDateFormat:"hh:mm a")
+        (timeFormatter setTimeZone:timezone)
         (set dayFormatter (NSDateFormatter new))
         (dayFormatter setDateFormat:"EEEE")
+        (dayFormatter setTimeZone:timezone)
+        
+        (set session ((Conference sharedInstance) sessionWithName:sessionname))
+        (set sections (array))
         (set sessionTime (dateParser dateFromString:(session time:)))
         (set sessionText (+ (dayFormatter stringFromDate:sessionTime) ", "
                             (timeFormatter stringFromDate:sessionTime) ", "
@@ -189,11 +210,13 @@
         page)
 
 (def row-for-session (session)
+     (set timezone (NSTimeZone timeZoneWithName:"PST"))
      (set dateParser (NSDateFormatter new))
      (dateParser setDateFormat:"yyyy-MM-dd'T'HH:mm:ss.SSSZ")
      (set sessionTime (dateParser dateFromString:(session time:)))
      (set timeFormatter (NSDateFormatter new))
      (timeFormatter setDateFormat:"EEEE, hh:mm a")
+     (timeFormatter setTimeZone:timezone)
      (set markdownString ((NSMutableString alloc) init))
      (markdownString appendString:(timeFormatter stringFromDate:sessionTime))
      (markdownString appendString:"\n\n")
